@@ -1,0 +1,410 @@
+// ── Mock data layer ────────────────────────────────────────────────────────────
+// Swap these with real API calls (e.g. Supabase) when going to production.
+
+export const SUBJECTS = [
+  { id: 'math',      name: 'Math',      cls: 'math',      icon: '∫',   bg: 'math-bg',     desc: 'AP Calc BC, algebra, series & sequences' },
+  { id: 'english',   name: 'English',   cls: 'english',   icon: '¶',   bg: 'english-bg',  desc: 'Essays, AP Lit FRQs, college apps' },
+  { id: 'physics',   name: 'Physics',   cls: 'physics',   icon: 'α',   bg: 'science-bg',  desc: 'Mechanics, circuits, AP Physics 1 & 2' },
+  { id: 'chemistry', name: 'Chemistry', cls: 'chemistry', icon: '⚗',   bg: 'science-bg',  desc: 'Stoichiometry, orgo, AP Chem' },
+  { id: 'biology',   name: 'Biology',   cls: 'biology',   icon: 'DNA', bg: 'science-bg',  desc: 'Cell bio, genetics, AP Bio' },
+  { id: 'computing', name: 'Computing', cls: 'computing', icon: '{ }', bg: 'cs-bg',       desc: 'Python, Java, web dev, algorithms', iconMono: true },
+];
+
+export const TUTORS = [
+  {
+    id: 'maya', name: 'Maya Okafor', initials: 'MO', avatarColor: 'avatar-c1', avatarBg: 'bg-1',
+    year: 'Senior', grade: 12, major: 'AP Calc BC · Lin. Algebra',
+    subjects: ['math', 'physics'],
+    bio: "I'll meet you where you are — whether that's calc series tests or just nailing factoring. Most of my students go from 'this is impossible' to 'wait, that was actually fun.'",
+    bio2: "I tutor by working problems with you, not lecturing at you. Bring a textbook page or a worksheet and we'll get unstuck together.",
+    languages: ['English', 'Igbo'],
+    sessionsCount: 142, rating: 4.9,
+    nextSlot: 'Tomorrow, 3:30 PM',
+    favoriteUnits: ['Series & sequences', 'Rotational dynamics', 'Trig identities'],
+  },
+  {
+    id: 'rohan', name: 'Rohan Patel', initials: 'RP', avatarColor: 'avatar-c3', avatarBg: 'bg-3',
+    year: 'Senior', grade: 12, major: 'CS Club lead · AP CS A',
+    subjects: ['computing', 'math'],
+    bio: "Built 3 apps this year and won the regional hackathon. I love debugging with people — it's a vibe.",
+    bio2: 'Comfortable with Java, Python, JavaScript, and the kind of recursion problems that make your eyes glaze over.',
+    languages: ['English', 'Gujarati'],
+    sessionsCount: 89, rating: 4.95,
+    nextSlot: 'Wednesday, 4:00 PM',
+    favoriteUnits: ['Recursion', 'Big-O', 'OOP design'],
+  },
+  {
+    id: 'elena', name: 'Elena Vasquez', initials: 'EV', avatarColor: 'avatar-c5', avatarBg: 'bg-5',
+    year: 'Junior', grade: 11, major: 'AP Lit · Speech & Debate',
+    subjects: ['english'],
+    bio: "Essay panic? I got you. We'll outline, draft, and revise — and your thesis will actually say something.",
+    bio2: 'Specialty: college app essays, AP Lit FRQs, Socratic seminars. I read fast and edit honestly.',
+    languages: ['English', 'Spanish'],
+    sessionsCount: 76, rating: 4.85,
+    nextSlot: 'Today, 5:00 PM',
+    favoriteUnits: ['Thesis crafting', 'Close reading', 'Personal essays'],
+  },
+  {
+    id: 'kai', name: 'Kai Thompson', initials: 'KT', avatarColor: 'avatar-c2', avatarBg: 'bg-2',
+    year: 'Senior', grade: 12, major: 'AP Chem · Research intern',
+    subjects: ['chemistry', 'biology'],
+    bio: "Stoichiometry made me cry once too. Now I'm pretty good at it. Let me show you the shortcuts I wish I'd known.",
+    bio2: 'I keep things visual — lots of drawing, lots of analogies. Reaction mechanisms become stories.',
+    languages: ['English'],
+    sessionsCount: 54, rating: 4.8,
+    nextSlot: 'Thursday, 3:00 PM',
+    favoriteUnits: ['Equilibrium', 'Organic mechanisms', 'Cell respiration'],
+  },
+  {
+    id: 'amira', name: 'Amira Hassan', initials: 'AH', avatarColor: 'avatar-c6', avatarBg: 'bg-6',
+    year: 'Senior', grade: 12, major: 'AP Bio · Pre-med track',
+    subjects: ['biology', 'chemistry'],
+    bio: "Memorizing pathways is a trap. I'll teach you the logic behind them so you can derive on the fly.",
+    bio2: 'I draw a lot of diagrams. Bring paper.',
+    languages: ['English', 'Arabic'],
+    sessionsCount: 103, rating: 4.92,
+    nextSlot: 'Tomorrow, 4:30 PM',
+    favoriteUnits: ['Genetics', 'Cell signaling', 'Ecosystems'],
+  },
+  {
+    id: 'liam', name: 'Liam Chen', initials: 'LC', avatarColor: 'avatar-c8', avatarBg: 'bg-8',
+    year: 'Junior', grade: 11, major: 'Physics Olympiad team',
+    subjects: ['physics', 'math'],
+    bio: "If your textbook makes physics feel like memorization, we're using the wrong textbook.",
+    bio2: 'Patient, slow when needed, and big on free-body diagrams.',
+    languages: ['English', 'Mandarin'],
+    sessionsCount: 61, rating: 4.88,
+    nextSlot: 'Monday, 4:00 PM',
+    favoriteUnits: ['Kinematics', 'Circuits', 'Waves'],
+  },
+  {
+    id: 'sofia', name: 'Sofia Rinaldi', initials: 'SR', avatarColor: 'avatar-c4', avatarBg: 'bg-4',
+    year: 'Senior', grade: 12, major: 'Lit magazine editor',
+    subjects: ['english'],
+    bio: "Grammar isn't gatekeeping — it's a toolkit. I'll help you write sentences that actually sound like you.",
+    bio2: "Big fan of revision over drafting. We'll make your second draft hit.",
+    languages: ['English', 'Italian'],
+    sessionsCount: 47, rating: 4.9,
+    nextSlot: 'Friday, 3:30 PM',
+    favoriteUnits: ['Argumentative essays', 'Poetry analysis', 'Grammar'],
+  },
+  {
+    id: 'devon', name: 'Devon Brooks', initials: 'DB', avatarColor: 'avatar-c7', avatarBg: 'bg-7',
+    year: 'Senior', grade: 12, major: 'Robotics captain · CS',
+    subjects: ['computing', 'physics'],
+    bio: "Three years on the robotics team. I know how to debug code AND a stripped servo motor.",
+    bio2: 'Strong on Python, web stuff, and anything that involves making electronics behave.',
+    languages: ['English'],
+    sessionsCount: 38, rating: 4.75,
+    nextSlot: 'Tomorrow, 6:00 PM',
+    favoriteUnits: ['Web basics', 'Arduino', 'Algorithms'],
+  },
+];
+
+export const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+export const DAY_NUMS = [19, 20, 21, 22, 23];
+export const HOURS = ['8 AM', '9 AM', '10 AM', '11 AM', '12 PM', '1 PM', '2 PM', '3 PM', '4 PM', '5 PM', '6 PM'];
+
+// SLOTS[tutorId][dayIndex][hourIndex] = 0 (free) | 1 (booked) — omitted = unavailable
+function makeGrid(entries) {
+  const g = {};
+  entries.forEach(({ day, hour, booked }) => {
+    if (!g[day]) g[day] = {};
+    g[day][hour] = booked ? 1 : 0;
+  });
+  return g;
+}
+
+export const SLOTS = {
+  maya:  makeGrid([{ day:0,hour:7 },{ day:0,hour:8 },{ day:1,hour:6,booked:true },{ day:1,hour:7 },{ day:2,hour:8 },{ day:2,hour:9 },{ day:3,hour:7 },{ day:3,hour:8 },{ day:3,hour:9 },{ day:4,hour:6 },{ day:4,hour:7 }]),
+  rohan: makeGrid([{ day:0,hour:9 },{ day:0,hour:10 },{ day:2,hour:7 },{ day:2,hour:8 },{ day:2,hour:9 },{ day:3,hour:8,booked:true },{ day:3,hour:9 },{ day:4,hour:7 },{ day:4,hour:8 }]),
+  elena: makeGrid([{ day:0,hour:8 },{ day:0,hour:9 },{ day:1,hour:7 },{ day:1,hour:8 },{ day:3,hour:9 },{ day:3,hour:10 },{ day:4,hour:7 }]),
+  kai:   makeGrid([{ day:1,hour:6 },{ day:1,hour:7 },{ day:3,hour:7 },{ day:3,hour:8 }]),
+  amira: makeGrid([{ day:0,hour:7 },{ day:1,hour:8 },{ day:1,hour:9 },{ day:2,hour:7,booked:true },{ day:2,hour:8 },{ day:3,hour:7 },{ day:4,hour:8 },{ day:4,hour:9 }]),
+  liam:  makeGrid([{ day:0,hour:7 },{ day:0,hour:8 },{ day:2,hour:9 },{ day:2,hour:10 },{ day:4,hour:8 }]),
+  sofia: makeGrid([{ day:1,hour:7 },{ day:1,hour:8 },{ day:4,hour:7 },{ day:4,hour:8 }]),
+  devon: makeGrid([{ day:0,hour:10 },{ day:1,hour:9 },{ day:1,hour:10 },{ day:3,hour:9 },{ day:4,hour:9 }]),
+};
+
+export const RECORDINGS = [
+  {
+    id: 'lec-1', tutorId: 'maya', subject: 'math',
+    title: 'Series & Sequences — AP Calc BC',
+    desc: 'Full walkthrough of convergence tests: ratio test, integral test, comparison. Includes 5 practice problems at the end.',
+    duration: '48 min', views: 312, uploadedAt: 'May 10, 2026',
+    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    tags: ['AP Calc BC', 'Series', 'Convergence'],
+    level: 'AP / Advanced',
+  },
+  {
+    id: 'lec-2', tutorId: 'rohan', subject: 'computing',
+    title: 'Recursion & Big-O from scratch',
+    desc: 'Start from zero — what recursion actually is, how the call stack works, and how to think about Big-O without memorising formulas.',
+    duration: '55 min', views: 480, uploadedAt: 'May 8, 2026',
+    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    tags: ['AP CS A', 'Recursion', 'Big-O'],
+    level: 'Intermediate',
+  },
+  {
+    id: 'lec-3', tutorId: 'elena', subject: 'english',
+    title: 'Writing a thesis that actually argues something',
+    desc: 'Most thesis statements describe instead of argue. In this lecture we fix that — with a before/after workshop on real AP Lit prompts.',
+    duration: '34 min', views: 198, uploadedAt: 'May 12, 2026',
+    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    tags: ['AP Lit', 'Essay', 'Thesis'],
+    level: 'Intermediate',
+  },
+  {
+    id: 'lec-4', tutorId: 'amira', subject: 'biology',
+    title: 'Cell signaling — logic not memorisation',
+    desc: "Every signaling pathway follows the same pattern. Once you see it, you can derive the rest on the fly. That's what this lecture teaches.",
+    duration: '41 min', views: 267, uploadedAt: 'May 6, 2026',
+    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    tags: ['AP Bio', 'Cell Biology', 'Signaling'],
+    level: 'AP / Advanced',
+  },
+  {
+    id: 'lec-5', tutorId: 'kai', subject: 'chemistry',
+    title: 'Stoichiometry shortcuts',
+    desc: "Stoich is just unit conversion. Once you stop thinking of it as chemistry and start thinking of it as maths, it clicks. Let me show you.",
+    duration: '38 min', views: 145, uploadedAt: 'May 2, 2026',
+    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    tags: ['AP Chem', 'Stoichiometry', 'Mole'],
+    level: 'Foundation',
+  },
+  {
+    id: 'lec-6', tutorId: 'liam', subject: 'physics',
+    title: 'Rotational dynamics — the only 3 equations you need',
+    desc: 'Torque, moment of inertia, angular momentum. Once you know which scenario maps to which equation, the rest is plug-and-chug.',
+    duration: '44 min', views: 189, uploadedAt: 'Apr 28, 2026',
+    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    tags: ['AP Physics C', 'Rotation', 'Torque'],
+    level: 'AP / Advanced',
+  },
+  {
+    id: 'lec-7', tutorId: 'maya', subject: 'math',
+    title: 'Trig identities — how to actually remember them',
+    desc: "You don't memorise all 30 identities. You memorise 3 and derive the rest. Here's how.",
+    duration: '29 min', views: 411, uploadedAt: 'Apr 22, 2026',
+    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    tags: ['Pre-Calc', 'Trig', 'Identities'],
+    level: 'Intermediate',
+  },
+  {
+    id: 'lec-8', tutorId: 'devon', subject: 'computing',
+    title: 'Build your first web page in 30 minutes',
+    desc: 'HTML, CSS, a little JavaScript. By the end you will have a live page you can share with anyone.',
+    duration: '32 min', views: 523, uploadedAt: 'Apr 18, 2026',
+    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    tags: ['Web Dev', 'HTML', 'Beginner'],
+    level: 'Foundation',
+  },
+];
+
+// Live peer lecture announcements (scheduled events with RSVP)
+export const PEER_LECTURES = [
+  {
+    id: 'L1', featured: true,
+    subject: 'math', subjectName: 'AP Calc BC',
+    title: 'How to actually study for the BC exam — a 12-day plan that works',
+    blurb: "I scored a 5 in May. Here's the exact study sequence I used: which Princeton Review chapters to skip, the four FRQ archetypes that show up every year, and how to stop losing two points on series questions.",
+    presenterId: 'maya', presenter: 'Maya Okafor', presenterInit: 'MO', presenterBg: 'bg-1',
+    presenterMeta: 'Senior · scored 5 on AP Calc BC',
+    day: 'Wed', dom: 21, month: 'May', dateKey: 'may-21',
+    time: '4:00 – 4:45 PM', location: 'Library Room 204',
+    rsvp: 28, capacity: 40,
+    tags: ['AP review', 'Study plan', 'Series & sequences'],
+  },
+  {
+    id: 'L2',
+    subject: 'computing', subjectName: 'AP CS A',
+    title: 'Build your first web app in 90 minutes',
+    blurb: 'From an empty folder to a working to-do app. We\'ll use plain HTML, CSS, and a sprinkle of JavaScript. Bring a laptop.',
+    presenterId: 'rohan', presenter: 'Rohan Patel', presenterInit: 'RP', presenterBg: 'bg-3',
+    presenterMeta: 'Senior · CS Club lead',
+    day: 'Thu', dom: 22, month: 'May', dateKey: 'may-22',
+    time: '5:00 – 6:30 PM', location: 'Computer Lab (B-wing)',
+    rsvp: 19, capacity: 24,
+    tags: ['Workshop', 'Hands-on', 'Bring a laptop'],
+  },
+  {
+    id: 'L3',
+    subject: 'english', subjectName: 'AP Lit',
+    title: 'Essay clinic — thesis to draft in one sitting',
+    blurb: 'Open lab format. Bring a prompt or a half-finished draft and we\'ll work through it together. Office-hours vibes.',
+    presenterId: 'elena', presenter: 'Elena Vasquez', presenterInit: 'EV', presenterBg: 'bg-5',
+    presenterMeta: 'Junior · AP Lit & Speech',
+    day: 'Fri', dom: 23, month: 'May', dateKey: 'may-23',
+    time: '3:30 – 5:00 PM', location: 'Library Room 204',
+    rsvp: 14, capacity: 20,
+    tags: ['Clinic', 'Drop-in', 'Bring a draft'],
+  },
+  {
+    id: 'L4',
+    subject: 'chemistry', subjectName: 'AP Chem',
+    title: 'Reaction mechanisms — drawn on the whiteboard, slowly',
+    blurb: "Arrows, electrons, and why SN1 vs SN2 stops being scary. I'll go full-speed at first, then we'll redo every step.",
+    presenterId: 'kai', presenter: 'Kai Thompson', presenterInit: 'KT', presenterBg: 'bg-2',
+    presenterMeta: 'Senior · Chem research intern',
+    day: 'Mon', dom: 19, month: 'May', dateKey: 'may-19',
+    time: '3:30 – 4:30 PM', location: 'Chem Lab 3',
+    rsvp: 22, capacity: 30,
+    tags: ['Whiteboard session', 'Mechanisms'],
+  },
+  {
+    id: 'L5',
+    subject: 'english', subjectName: 'College apps',
+    title: 'Speed-running your personal essay (without the panic)',
+    blurb: 'How to draft a Common App essay in a weekend and still have it sound like a human being wrote it. Live outlining demo.',
+    presenterId: 'sofia', presenter: 'Sofia Rinaldi', presenterInit: 'SR', presenterBg: 'bg-4',
+    presenterMeta: 'Senior · Lit magazine editor',
+    day: 'Tue', dom: 20, month: 'May', dateKey: 'may-20',
+    time: '5:00 – 6:00 PM', location: 'Library Room 204',
+    rsvp: 31, capacity: 40,
+    tags: ['Seniors', 'College apps', 'Demo'],
+  },
+  {
+    id: 'L6',
+    subject: 'physics', subjectName: 'Olympiad prep',
+    title: 'Physics olympiad warm-ups — five mechanics problems, no shortcuts',
+    blurb: "If you're thinking about F=ma in the fall, come early. We'll work five real past problems on the board together.",
+    presenterId: 'liam', presenter: 'Liam Chen', presenterInit: 'LC', presenterBg: 'bg-8',
+    presenterMeta: 'Junior · Physics Olympiad team',
+    day: 'Sat', dom: 24, month: 'May', dateKey: 'may-24',
+    time: '10:00 – 11:30 AM', location: 'Physics Lab',
+    rsvp: 11, capacity: 18,
+    tags: ['Saturday session', 'Competition prep'],
+  },
+  {
+    id: 'L7',
+    subject: 'biology', subjectName: 'AP Bio',
+    title: 'Genetics — the three rules everything reduces to',
+    blurb: 'Stop memorizing Punnett squares. We\'ll derive linkage, recombination, and pedigree problems from first principles.',
+    presenterId: 'amira', presenter: 'Amira Hassan', presenterInit: 'AH', presenterBg: 'bg-6',
+    presenterMeta: 'Senior · Pre-med track',
+    day: 'Thu', dom: 22, month: 'May', dateKey: 'may-22',
+    time: '3:30 – 4:30 PM', location: 'Bio Lab 2',
+    rsvp: 17, capacity: 25,
+    tags: ['First principles', 'AP review'],
+  },
+  {
+    id: 'L8',
+    subject: 'computing', subjectName: 'Robotics',
+    title: 'Robotics off-season — Arduino sandbox night',
+    blurb: 'Wire something up, blink an LED, drive a servo. Robotics team is hosting; tutors will float around to help.',
+    presenterId: 'devon', presenter: 'Devon Brooks', presenterInit: 'DB', presenterBg: 'bg-7',
+    presenterMeta: 'Senior · Robotics captain',
+    day: 'Fri', dom: 23, month: 'May', dateKey: 'may-23',
+    time: '5:00 – 7:00 PM', location: 'Robotics Workshop',
+    rsvp: 9, capacity: 16,
+    tags: ['Off-season', 'Hardware', 'Drop-in'],
+  },
+];
+
+// On-demand video lessons
+export const VIDEOS = [
+  {
+    id: 'V1', subject: 'math', subjectName: 'AP Calc BC',
+    title: 'Series convergence in 12 minutes',
+    blurb: 'Ratio test, root test, p-series — when to reach for which.',
+    glyph: '∫', glyphBg: 'math-bg',
+    presenterId: 'maya', presenter: 'Maya Okafor', presenterInit: 'MO', presenterBg: 'bg-1',
+    duration: '12:34', views: 1240, postedAgo: '3 days ago', featured: true,
+  },
+  {
+    id: 'V2', subject: 'computing', subjectName: 'AP CS A',
+    title: 'Recursion: learn to think like a function',
+    blurb: 'Three problems, drawn step by step. By the end, recursion stops feeling like dark magic.',
+    glyph: '{ }', glyphBg: 'cs-bg',
+    presenterId: 'rohan', presenter: 'Rohan Patel', presenterInit: 'RP', presenterBg: 'bg-3',
+    duration: '18:22', views: 892, postedAgo: '1 week ago',
+  },
+  {
+    id: 'V3', subject: 'english', subjectName: 'AP Lit',
+    title: 'Thesis statements that don\'t suck',
+    blurb: "How to write a thesis that an FRQ scorer can't ignore.",
+    glyph: '¶', glyphBg: 'english-bg',
+    presenterId: 'elena', presenter: 'Elena Vasquez', presenterInit: 'EV', presenterBg: 'bg-5',
+    duration: '9:15', views: 612, postedAgo: '5 days ago',
+  },
+  {
+    id: 'V4', subject: 'chemistry', subjectName: 'AP Chem',
+    title: 'Stoichiometry the visual way',
+    blurb: "I draw every problem out. By the end you won't need a calculator for half of them.",
+    glyph: '⚗', glyphBg: 'science-bg',
+    presenterId: 'kai', presenter: 'Kai Thompson', presenterInit: 'KT', presenterBg: 'bg-2',
+    duration: '14:50', views: 721, postedAgo: '2 weeks ago',
+  },
+  {
+    id: 'V5', subject: 'biology', subjectName: 'AP Bio',
+    title: 'Cell respiration in one diagram',
+    blurb: 'Glycolysis → Krebs → ETC. One page, one diagram, no flashcards.',
+    glyph: 'α', glyphBg: 'science-bg',
+    presenterId: 'amira', presenter: 'Amira Hassan', presenterInit: 'AH', presenterBg: 'bg-6',
+    duration: '11:02', views: 1420, postedAgo: '4 days ago',
+  },
+  {
+    id: 'V6', subject: 'physics', subjectName: 'AP Physics',
+    title: 'Free-body diagrams — 5 worked problems',
+    blurb: 'Inclines, pulleys, friction. Always start with the diagram.',
+    glyph: 'F⃗', glyphBg: 'math-bg',
+    presenterId: 'liam', presenter: 'Liam Chen', presenterInit: 'LC', presenterBg: 'bg-8',
+    duration: '22:11', views: 538, postedAgo: '1 week ago',
+  },
+  {
+    id: 'V7', subject: 'computing', subjectName: 'AP CS A',
+    title: 'From Java for-loops to recursion',
+    blurb: 'If you can write a loop, you can write a recursion. Same problem, two ways.',
+    glyph: 'λ', glyphBg: 'cs-bg',
+    presenterId: 'devon', presenter: 'Devon Brooks', presenterInit: 'DB', presenterBg: 'bg-7',
+    duration: '16:30', views: 410, postedAgo: '2 weeks ago',
+  },
+  {
+    id: 'V8', subject: 'english', subjectName: 'AP Lit',
+    title: 'Walking through a sonnet — close reading live',
+    blurb: 'Shakespeare 73, line by line. How to find an argument inside a love poem.',
+    glyph: '❦', glyphBg: 'english-bg',
+    presenterId: 'sofia', presenter: 'Sofia Rinaldi', presenterInit: 'SR', presenterBg: 'bg-4',
+    duration: '13:48', views: 381, postedAgo: '3 weeks ago',
+  },
+  {
+    id: 'V9', subject: 'math', subjectName: 'Pre-calc',
+    title: 'Trig identities you actually need',
+    blurb: 'Six identities. Forget the rest.',
+    glyph: 'θ', glyphBg: 'math-bg',
+    presenterId: 'maya', presenter: 'Maya Okafor', presenterInit: 'MO', presenterBg: 'bg-1',
+    duration: '10:08', views: 802, postedAgo: '1 month ago',
+  },
+  {
+    id: 'V10', subject: 'biology', subjectName: 'AP Bio',
+    title: 'Cell signaling explained without the jargon',
+    blurb: 'Receptors, second messengers, cascades. Five minutes per concept.',
+    glyph: '✦', glyphBg: 'science-bg',
+    presenterId: 'amira', presenter: 'Amira Hassan', presenterInit: 'AH', presenterBg: 'bg-6',
+    duration: '19:24', views: 670, postedAgo: '3 weeks ago',
+  },
+];
+
+export const STUDENT_SESSIONS = [
+  { id:'s1', tutorId:'maya', subject:'Math', topic:'Series convergence — practice FRQs', day:'Thu', dom:16, month:'May', time:'3:30–4:30 PM', location:'Library, Room 204', status:'upcoming' },
+  { id:'s2', tutorId:'elena', subject:'English', topic:'AP Lit essay revision', day:'Mon', dom:20, month:'May', time:'5:00–6:00 PM', location:'Online', status:'upcoming' },
+  { id:'s3', tutorId:'rohan', subject:'Computing', topic:'Recursion practice problems', day:'Wed', dom:22, month:'May', time:'4:00–5:00 PM', location:'Computer Lab', status:'upcoming' },
+];
+
+export const STUDENT_PAST = [
+  { id:'p1', tutorId:'kai', subject:'Chemistry', topic:'Stoichiometry warm-up', day:'Mon', dom:6, month:'May', time:'3:30–4:30 PM', location:'Library', status:'completed' },
+  { id:'p2', tutorId:'maya', subject:'Math', topic:'Derivatives review', day:'Fri', dom:3, month:'May', time:'4:00–5:00 PM', location:'Library', status:'completed' },
+];
+
+export const TUTOR_SESSIONS = [
+  { id:'t1', studentName:'Jordan Pierce', studentInitials:'JP', studentColor:'avatar-c2', subject:'Math', topic:'Series convergence', day:'Thu', dom:16, month:'May', time:'3:30–4:30 PM' },
+  { id:'t2', studentName:'Priya Shah', studentInitials:'PS', studentColor:'avatar-c5', subject:'Physics', topic:'Rotational dynamics', day:'Fri', dom:17, month:'May', time:'4:00–5:00 PM' },
+  { id:'t3', studentName:'Marcus Lin', studentInitials:'ML', studentColor:'avatar-c3', subject:'Math', topic:'Integration by parts', day:'Mon', dom:20, month:'May', time:'3:00–4:00 PM' },
+];
+
+// Mock users — in production replace with real auth
+export const MOCK_USERS = [
+  { id: 'u-jordan', email: 'jordan@wakefield.edu', password: 'student123', name: 'Jordan Pierce', initials: 'JP', avatarColor: 'avatar-c2', role: 'student', grade: 10, year: 'Sophomore' },
+  { id: 'u-maya',   email: 'maya@wakefield.edu',   password: 'tutor123',  name: 'Maya Okafor',   initials: 'MO', avatarColor: 'avatar-c1', role: 'tutor',   tutorId: 'maya' },
+  { id: 'u-rohan',  email: 'rohan@wakefield.edu',  password: 'tutor123',  name: 'Rohan Patel',   initials: 'RP', avatarColor: 'avatar-c3', role: 'tutor',   tutorId: 'rohan' },
+];

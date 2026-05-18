@@ -39,10 +39,10 @@ export default function Signup() {
       <div className="auth-card">
         <div className="auth-logo serif">peerhour</div>
         <h1 className="auth-title">Create account</h1>
-        <p className="auth-sub">Wakefield High peer tutoring</p>
+        <p className="auth-sub">Reddam House North Shore peer tutoring</p>
 
         <div style={{ background: 'var(--bg-sunk)', borderRadius: 'var(--radius-md)', padding: '10px 14px', marginBottom: 24, fontSize: 13, color: 'var(--fg-muted)' }}>
-          Signing up as a <strong style={{ color: 'var(--fg)' }}>student</strong>. Tutor accounts are invite-only — existing tutors can sign in below.
+          Signing up as a <strong style={{ color: 'var(--fg)' }}>student</strong>. Tutor accounts are for <strong style={{ color: 'var(--fg)' }}>Year 11 students</strong> only — if you're in Year 11 and want to tutor, sign up and we'll upgrade your account.
         </div>
 
         <form onSubmit={handleSubmit} className="auth-form">
@@ -66,7 +66,7 @@ export default function Signup() {
             <input
               type="email"
               className="input"
-              placeholder="you@wakefield.edu"
+              placeholder="you@rhns.nsw.edu.au"
               value={email}
               onChange={e => setEmail(e.target.value)}
               required

@@ -1,22 +1,46 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { VIDEOS, SUBJECTS } from '../../data/index.js';
-import { Play, Eye, Bookmark, Plus } from '../../components/ui/Icons.jsx';
+import { useAuth } from '../../store/AuthContext.jsx';
+import { useAppData } from '../../store/AppDataContext.jsx';
+import { Play, Eye, Bookmark, Plus, X } from '../../components/ui/Icons.jsx';
 
 function fmtViews(n) {
   return n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(n);
 }
 
+function Modal({ onClose, children }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose(); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [onClose]);
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+      <div ref={ref} style={{ background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: 28, maxWidth: 560, width: '100%', boxShadow: 'var(--shadow-lg)', position: 'relative' }}>
+        <button onClick={onClose} style={{ position: 'absolute', top: 14, right: 14, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--fg-muted)', padding: 4 }}>
+          <X size={16} />
+        </button>
+        {children}
+      </div>
+    </div>
+  );
+}
+
 export default function Videos() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { savedVideos, toggleSavedVideo } = useAppData();
   const [filter, setFilter] = useState('all');
   const [sort, setSort] = useState('recent');
   const [now, setNow] = useState(VIDEOS.find(v => v.featured) || VIDEOS[0]);
-  const [saved, setSaved] = useState({ V5: true });
+  const [showLibrary, setShowLibrary] = useState(false);
+  const [showPlayer, setShowPlayer] = useState(false);
 
   const toggleSave = (id, e) => {
     e?.stopPropagation();
-    setSaved(s => ({ ...s, [id]: !s[id] }));
+    toggleSavedVideo(id);
   };
 
   let list = filter === 'all' ? VIDEOS : VIDEOS.filter(v => v.subject === filter);
@@ -33,8 +57,68 @@ export default function Videos() {
     return s + m + sec / 60;
   }, 0);
 
+  const savedList = VIDEOS.filter(v => savedVideos[v.id]);
+
+  const handleRecord = () => {
+    if (user?.role === 'tutor') {
+      navigate('/tutor/upload');
+    }
+  };
+
   return (
     <div className="vids">
+      {/* My library modal */}
+      {showLibrary && (
+        <Modal onClose={() => setShowLibrary(false)}>
+          <h3 className="serif" style={{ fontSize: 22, marginBottom: 16 }}>My library</h3>
+          {savedList.length === 0 ? (
+            <p style={{ color: 'var(--fg-muted)', fontSize: 14 }}>No saved videos yet. Click the bookmark icon on any video to save it here.</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {savedList.map(v => (
+                <button
+                  key={v.id}
+                  style={{ display: 'flex', gap: 12, alignItems: 'center', background: 'var(--bg-elev)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '10px 14px', cursor: 'pointer', textAlign: 'left' }}
+                  onClick={() => { setNow(v); setShowLibrary(false); }}
+                >
+                  <div className={`vid-upnext-thumb ${v.glyphBg}`} style={{ width: 48, height: 36, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-serif)', fontSize: 18, flexShrink: 0 }}>
+                    {v.glyph}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 500, fontSize: 14, marginBottom: 2 }}>{v.title}</div>
+                    <div style={{ fontSize: 12, color: 'var(--fg-muted)' }}>{v.presenter} · {v.duration}</div>
+                  </div>
+                  <button
+                    className="btn"
+                    style={{ padding: '4px 8px', fontSize: 12 }}
+                    onClick={e => { e.stopPropagation(); toggleSave(v.id); }}
+                  >
+                    Remove
+                  </button>
+                </button>
+              ))}
+            </div>
+          )}
+        </Modal>
+      )}
+
+      {/* Video player modal */}
+      {showPlayer && (
+        <Modal onClose={() => setShowPlayer(false)}>
+          <h3 className="serif" style={{ fontSize: 18, marginBottom: 12 }}>{now.title}</h3>
+          <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, borderRadius: 8, overflow: 'hidden' }}>
+            <iframe
+              src={now.videoUrl}
+              title={now.title}
+              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+          <div style={{ marginTop: 12, fontSize: 13, color: 'var(--fg-muted)' }}>{now.presenter} · {now.subjectName} · {now.duration}</div>
+        </Modal>
+      )}
+
       <div className="page-header">
         <div>
           <div className="eyebrow">On-demand · always available</div>
@@ -42,8 +126,12 @@ export default function Videos() {
           <p className="page-sub">Short video lessons recorded by tutors. Watch any time — and when you want to dig deeper, book the tutor who made it.</p>
         </div>
         <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-          <button className="btn"><Bookmark size={14} />My library</button>
-          <button className="btn primary"><Plus size={14} />Record a lesson</button>
+          <button className="btn" onClick={() => setShowLibrary(true)}>
+            <Bookmark size={14} />My library {savedList.length > 0 && `(${savedList.length})`}
+          </button>
+          {user?.role === 'tutor' && (
+            <button className="btn primary" onClick={handleRecord}><Plus size={14} />Record a lesson</button>
+          )}
         </div>
       </div>
 
@@ -51,7 +139,7 @@ export default function Videos() {
       <section className="vid-hero">
         <div className={`vid-hero-thumb ${now.glyphBg}`}>
           <div className="vid-hero-glyph serif">{now.glyph}</div>
-          <button className="vid-play-btn" aria-label="Play">
+          <button className="vid-play-btn" aria-label="Play" onClick={() => setShowPlayer(true)}>
             <Play size={28} />
           </button>
           <div className="vid-hero-progress">
@@ -82,12 +170,12 @@ export default function Videos() {
             </div>
           </button>
           <div className="vid-hero-actions">
-            <button className="btn primary"><Play size={14} />Resume</button>
+            <button className="btn primary" onClick={() => setShowPlayer(true)}><Play size={14} />Watch now</button>
             <button
-              className={`btn ${saved[now.id] ? 'accent' : ''}`}
+              className={`btn ${savedVideos[now.id] ? 'accent' : ''}`}
               onClick={e => toggleSave(now.id, e)}
             >
-              <Bookmark size={14} />{saved[now.id] ? 'Saved' : 'Save'}
+              <Bookmark size={14} />{savedVideos[now.id] ? 'Saved' : 'Save'}
             </button>
             <button className="btn" onClick={() => navigate(`/tutor/${now.presenterId}`)}>Book the tutor</button>
           </div>
@@ -145,11 +233,11 @@ export default function Videos() {
           >
             <div className={`vid-thumb ${v.glyphBg}`}>
               <div className="vid-thumb-glyph serif">{v.glyph}</div>
-              <div className="vid-thumb-play"><Play size={16} /></div>
+              <div className="vid-thumb-play" onClick={e => { e.stopPropagation(); setNow(v); setShowPlayer(true); }}><Play size={16} /></div>
               <div className="vid-thumb-duration">{v.duration}</div>
               {v.id === now.id && <div className="vid-thumb-now">▸ playing</div>}
               <button
-                className={`vid-thumb-save ${saved[v.id] ? 'on' : ''}`}
+                className={`vid-thumb-save ${savedVideos[v.id] ? 'on' : ''}`}
                 onClick={e => toggleSave(v.id, e)}
                 aria-label="Save"
               >
@@ -179,11 +267,15 @@ export default function Videos() {
           <span className="serif">▶</span>
         </div>
         <div>
-          <div className="eyebrow">For tutors</div>
+          <div className="eyebrow">For Year 11 tutors</div>
           <h3 className="serif">Record a 10-min lesson. Reach the whole school.</h3>
           <p>One short video can save you a dozen 1-on-1 sessions answering the same question. Every video counts toward service hours, same as a live session.</p>
         </div>
-        <button className="btn primary lg"><Plus size={14} />Start recording</button>
+        {user?.role === 'tutor' ? (
+          <button className="btn primary lg" onClick={handleRecord}><Plus size={14} />Start recording</button>
+        ) : (
+          <button className="btn lg" disabled>Tutors only</button>
+        )}
       </div>
     </div>
   );

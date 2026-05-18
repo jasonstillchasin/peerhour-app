@@ -2,12 +2,23 @@ import { useState } from 'react';
 import { useAuth } from '../../store/AuthContext.jsx';
 import { TUTORS, DAYS, DAY_NUMS, HOURS, SLOTS } from '../../data/index.js';
 
+function load(key, fallback) {
+  try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; }
+}
+function save(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
+}
+
 export default function Availability() {
   const { user } = useAuth();
   const tutor = TUTORS.find(t => t.id === user?.tutorId) || TUTORS[0];
+  const storageKey = `ph_availability_${tutor.id}`;
 
-  const initialSlots = SLOTS[tutor.id] || {};
   const [availability, setAvailability] = useState(() => {
+    const persisted = load(storageKey, null);
+    if (persisted) return persisted;
+
+    const initialSlots = SLOTS[tutor.id] || {};
     const a = {};
     DAYS.forEach((_, di) => {
       a[di] = {};
@@ -22,7 +33,9 @@ export default function Availability() {
     setAvailability(a => {
       const cur = a[di]?.[hi];
       if (cur === 1) return a;
-      return { ...a, [di]: { ...a[di], [hi]: cur === 0 ? null : 0 } };
+      const next = { ...a, [di]: { ...a[di], [hi]: cur === 0 ? null : 0 } };
+      save(storageKey, next);
+      return next;
     });
   };
 

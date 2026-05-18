@@ -229,7 +229,7 @@ export const PEER_LECTURES = [
     presenterMeta: 'Year 11 · Ext 2 Maths & Physics tutor',
     day: 'Wed', dom: 21, month: 'May', dateKey: 'may-21',
     time: '4:00 – 4:45 PM', location: 'Library Room 204',
-    rsvp: 28, capacity: 40,
+    rsvp: 0, capacity: 40,
     tags: ['Exam prep', 'Study plan', 'Series & sequences'],
   },
   {
@@ -241,7 +241,7 @@ export const PEER_LECTURES = [
     presenterMeta: 'Year 11 · Flexible tutor',
     day: 'Thu', dom: 22, month: 'May', dateKey: 'may-22',
     time: '5:00 – 6:30 PM', location: 'Computer Lab (B-wing)',
-    rsvp: 19, capacity: 24,
+    rsvp: 0, capacity: 24,
     tags: ['Workshop', 'Hands-on', 'Bring a laptop'],
   },
   {
@@ -253,7 +253,7 @@ export const PEER_LECTURES = [
     presenterMeta: 'Year 11 · English & Maths tutor',
     day: 'Fri', dom: 23, month: 'May', dateKey: 'may-23',
     time: '3:30 – 5:00 PM', location: 'Library Room 204',
-    rsvp: 14, capacity: 20,
+    rsvp: 0, capacity: 20,
     tags: ['Clinic', 'Drop-in', 'Bring a draft'],
   },
   {
@@ -265,7 +265,7 @@ export const PEER_LECTURES = [
     presenterMeta: 'Year 11 · Maths, Physics & Chemistry tutor',
     day: 'Mon', dom: 19, month: 'May', dateKey: 'may-19',
     time: '3:30 – 4:30 PM', location: 'Chem Lab 3',
-    rsvp: 22, capacity: 30,
+    rsvp: 0, capacity: 30,
     tags: ['Whiteboard session', 'Mechanisms'],
   },
   {
@@ -277,7 +277,7 @@ export const PEER_LECTURES = [
     presenterMeta: 'Year 11 · English tutor',
     day: 'Tue', dom: 20, month: 'May', dateKey: 'may-20',
     time: '5:00 – 6:00 PM', location: 'Library Room 204',
-    rsvp: 31, capacity: 40,
+    rsvp: 0, capacity: 40,
     tags: ['Year 11 & 12', 'Uni apps', 'Demo'],
   },
   {
@@ -289,7 +289,7 @@ export const PEER_LECTURES = [
     presenterMeta: 'Year 11 · Maths & Science tutor',
     day: 'Sat', dom: 24, month: 'May', dateKey: 'may-24',
     time: '10:00 – 11:30 AM', location: 'Physics Lab',
-    rsvp: 11, capacity: 18,
+    rsvp: 0, capacity: 18,
     tags: ['Saturday session', 'Problem solving'],
   },
   {
@@ -301,7 +301,7 @@ export const PEER_LECTURES = [
     presenterMeta: 'Year 11 · Commerce & History tutor',
     day: 'Thu', dom: 22, month: 'May', dateKey: 'may-22',
     time: '3:30 – 4:30 PM', location: 'Library Room 204',
-    rsvp: 17, capacity: 25,
+    rsvp: 0, capacity: 25,
     tags: ['Source analysis', 'Exam technique'],
   },
   {
@@ -313,7 +313,7 @@ export const PEER_LECTURES = [
     presenterMeta: 'Year 11 · Maths tutor',
     day: 'Fri', dom: 23, month: 'May', dateKey: 'may-23',
     time: '4:00 – 5:30 PM', location: 'Library Room 204',
-    rsvp: 9, capacity: 20,
+    rsvp: 0, capacity: 20,
     tags: ['Drop-in', 'Any topic', 'Problem solving'],
   },
 ];

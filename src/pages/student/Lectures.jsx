@@ -28,8 +28,8 @@ function Modal({ onClose, children }) {
   );
 }
 
-function LectureCard({ lecture: l, rsvped, onRsvp, onPickTutor }) {
-  const pct = (l.rsvp / l.capacity) * 100;
+function LectureCard({ lecture: l, rsvped, count, onRsvp, onPickTutor }) {
+  const pct = (count / l.capacity) * 100;
   const nearlyFull = pct >= 75;
   return (
     <article className={`lec-card ${rsvped ? 'going' : ''}`}>
@@ -59,7 +59,7 @@ function LectureCard({ lecture: l, rsvped, onRsvp, onPickTutor }) {
             <div className="lec-seats-fill" style={{ width: `${pct}%`, background: nearlyFull ? 'var(--accent)' : 'var(--success)' }} />
           </div>
           <div className="lec-seats-label">
-            <strong>{l.rsvp}</strong>/{l.capacity}
+            <strong>{count}</strong>/{l.capacity}
             {nearlyFull && <span className="lec-nearly"> · filling up</span>}
           </div>
         </div>
@@ -74,7 +74,7 @@ function LectureCard({ lecture: l, rsvped, onRsvp, onPickTutor }) {
 export default function Lectures() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { rsvps, toggleRsvp } = useAppData();
+  const { rsvps, rsvpCounts, toggleRsvp } = useAppData();
   const [filter, setFilter] = useState('all');
   const [view, setView] = useState('upcoming');
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -91,7 +91,7 @@ export default function Lectures() {
 
   const handleRsvp = (id) => {
     if (!user) { setShowAuthModal(true); return; }
-    toggleRsvp(id);
+    toggleRsvp(id, user.email);
   };
 
   const handlePickTutor = (id) => {
@@ -126,7 +126,7 @@ export default function Lectures() {
   });
   grouped.sort((a, b) => a.dom - b.dom);
 
-  const totalRsvp = PEER_LECTURES.reduce((s, l) => s + l.rsvp, 0);
+  const totalRsvp = Object.values(rsvpCounts).reduce((s, n) => s + n, 0);
 
   return (
     <div className="lectures">
@@ -317,10 +317,10 @@ export default function Lectures() {
               <div className="lec-headline-rsvp">
                 <div className="lec-seats">
                   <div className="lec-seats-bar">
-                    <div className="lec-seats-fill" style={{ width: `${(featured.rsvp / featured.capacity) * 100}%` }} />
+                    <div className="lec-seats-fill" style={{ width: `${((rsvpCounts[featured.id] ?? 0) / featured.capacity) * 100}%` }} />
                   </div>
                   <div className="lec-seats-label">
-                    <strong>{featured.rsvp}</strong> of {featured.capacity} seats reserved
+                    <strong>{rsvpCounts[featured.id] ?? 0}</strong> of {featured.capacity} seats reserved
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
@@ -377,6 +377,7 @@ export default function Lectures() {
                   key={l.id}
                   lecture={l}
                   rsvped={!!rsvps[l.id]}
+                  count={rsvpCounts[l.id] ?? 0}
                   onRsvp={() => handleRsvp(l.id)}
                   onPickTutor={handlePickTutor}
                 />

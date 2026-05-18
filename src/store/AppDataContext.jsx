@@ -1,5 +1,5 @@
-import { createContext, useContext, useState } from 'react';
-import { STUDENT_SESSIONS, STUDENT_PAST, TUTOR_SESSIONS } from '../data/index.js';
+import { createContext, useContext, useState, useEffect } from 'react';
+import { STUDENT_SESSIONS, STUDENT_PAST, TUTOR_SESSIONS, PEER_LECTURES } from '../data/index.js';
 
 const AppDataContext = createContext(null);
 
@@ -15,7 +15,16 @@ export function AppDataProvider({ children }) {
   const [cancelledIds, setCancelledIds] = useState(() => load('ph_cancelled', []));
   const [tutorSessionsList, setTutorSessionsList] = useState(() => load('ph_tutor_sessions', TUTOR_SESSIONS));
   const [ratings, setRatings] = useState(() => load('ph_ratings', {}));
-  const [rsvps, setRsvps] = useState(() => load('ph_rsvp', { L1: true }));
+  const [rsvps, setRsvps] = useState(() => load('ph_rsvp', {}));
+  const [rsvpCounts, setRsvpCounts] = useState({});
+
+  useEffect(() => {
+    const ids = PEER_LECTURES.map(l => l.id).join(',');
+    fetch(`/api/rsvp-counts?ids=${ids}`)
+      .then(r => r.json())
+      .then(data => { if (!data.error) setRsvpCounts(data); })
+      .catch(() => {});
+  }, []);
   const [savedVideos, setSavedVideos] = useState(() => load('ph_saved_videos', { V5: true }));
   const [uploads, setUploads] = useState(() => load('ph_uploads', []));
 
@@ -63,12 +72,22 @@ export function AppDataProvider({ children }) {
   // Past sessions that haven't been rated yet (skip dismissed ones too)
   const unratedPastSessions = STUDENT_PAST.filter(s => !ratings[s.id]);
 
-  const toggleRsvp = (id) => {
-    setRsvps(r => {
-      const next = { ...r, [id]: !r[id] };
-      save('ph_rsvp', next);
-      return next;
-    });
+  const toggleRsvp = (id, userEmail) => {
+    const joining = !rsvps[id];
+    // Optimistic UI update
+    setRsvps(r => { const next = { ...r, [id]: joining }; save('ph_rsvp', next); return next; });
+    setRsvpCounts(c => ({ ...c, [id]: Math.max(0, (c[id] ?? 0) + (joining ? 1 : -1)) }));
+    // Persist to KV
+    if (userEmail) {
+      fetch('/api/rsvp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lectureId: id, email: userEmail, join: joining }),
+      })
+        .then(r => r.json())
+        .then(data => { if (data.count !== undefined) setRsvpCounts(c => ({ ...c, [id]: data.count })); })
+        .catch(() => {});
+    }
   };
 
   const toggleSavedVideo = (id) => {
@@ -98,7 +117,7 @@ export function AppDataProvider({ children }) {
       cancelStudentSession,
       tutorSessionsList, cancelTutorSession,
       ratings, addRating, unratedPastSessions,
-      rsvps, toggleRsvp,
+      rsvps, rsvpCounts, toggleRsvp,
       savedVideos, toggleSavedVideo,
       uploads, addUpload,
     }}>

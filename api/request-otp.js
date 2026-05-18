@@ -46,10 +46,10 @@ export default async function handler(req, res) {
     const { error: sendError } = await resend.emails.send({
       from,
       to: norm,
-      subject: 'Your peerhour sign-in code',
+      subject: 'Your Reddux sign-in code',
       html: `
         <div style="font-family:sans-serif;max-width:420px;margin:0 auto;padding:32px 24px">
-          <div style="font-size:22px;font-weight:700;margin-bottom:8px">peerhour</div>
+          <div style="font-size:22px;font-weight:700;margin-bottom:8px">Reddux</div>
           <p style="color:#555;margin-bottom:24px">Your one-time sign-in code:</p>
           <div style="font-size:40px;font-weight:700;letter-spacing:0.18em;text-align:center;
                       padding:20px;background:#f5f5f5;border-radius:10px;margin-bottom:24px">

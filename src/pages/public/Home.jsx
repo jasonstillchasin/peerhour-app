@@ -203,7 +203,7 @@ export default function Home() {
       <nav className="pub-nav">
         <div className="pub-nav-inner">
           <Link to="/" style={{ fontFamily: 'var(--font-serif)', fontSize: 24, color: 'var(--fg)', textDecoration: 'none', lineHeight: 1 }}>
-            peer<em style={{ color: 'var(--accent)' }}>hour</em>
+            Redd<em style={{ color: 'var(--accent)' }}>ux</em>
           </Link>
           <div className="pub-nav-links">
             <a href="#how">How it works</a>
@@ -241,7 +241,7 @@ export default function Home() {
         </h1>
 
         <p className="hero-lead" style={anim(1.3)}>
-          peerhour is a free booking platform for Reddam House North Shore students.
+          Reddux is a free booking platform for Reddam House North Shore students.
           Browse Year 11 students who tutor in your subjects, pick a free slot
           on their calendar, and meet — in the library, the lab, or online.
         </p>
@@ -428,7 +428,7 @@ export default function Home() {
             <div className="eyebrow">For Year 11 students</div>
             <h2 className="section-title">Tutoring counts. <em>Literally.</em></h2>
             <p className="section-lead">
-              Every hour you tutor through peerhour is verified and logged toward your
+              Every hour you tutor through Reddux is verified and logged toward your
               service-hour requirement. You set your own schedule, pick the subjects
               you actually want to teach, and meet students who genuinely want to be there.
             </p>
@@ -465,7 +465,7 @@ export default function Home() {
         </Reveal>
         <Reveal className="faq-list">
           <details className="faq" open>
-            <summary>Is peerhour really free?</summary>
+            <summary>Is Reddux really free?</summary>
             <p>Yes. Always. Peer tutoring is funded as part of RHNS's enrichment program — tutors earn service hours, not money. No transactions, no awkward asks.</p>
           </details>
           <details className="faq">
@@ -474,7 +474,7 @@ export default function Home() {
           </details>
           <details className="faq">
             <summary>Where do sessions happen?</summary>
-            <p>Library Room 204 is reserved for peerhour every weekday after school. You can also book the computer lab (good for computing sessions) or meet online via video call if you're sick or stuck at home.</p>
+            <p>Library Room 204 is reserved for Reddux every weekday after school. You can also book the computer lab (good for computing sessions) or meet online via video call if you're sick or stuck at home.</p>
           </details>
           <details className="faq">
             <summary>What if I need to cancel?</summary>
@@ -502,7 +502,7 @@ export default function Home() {
 
       {/* ── Footer ── */}
       <footer className="home-footer">
-        <div>peerhour · made by students, for students · Reddam House North Shore</div>
+        <div>Reddux · made by students, for students · Reddam House North Shore</div>
         <div className="footer-links">
           <a href="#">RHNS</a>
           <a href="#">Contact enrichment</a>

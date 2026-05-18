@@ -38,7 +38,7 @@ export default function Sidebar({ theme, onToggleTheme }) {
     <aside className="sidebar">
       <div className="sidebar-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
         <span className="sidebar-logo-mark serif">ph</span>
-        <span className="sidebar-logo-name">peerhour</span>
+        <span className="sidebar-logo-name">Reddux</span>
       </div>
 
       {user && (

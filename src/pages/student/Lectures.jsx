@@ -391,7 +391,7 @@ export default function Lectures() {
         <div>
           <div className="eyebrow">For Year 11 tutors</div>
           <h3 className="serif">Know a topic cold? Host a 45-min lecture.</h3>
-          <p>You pick the topic, the slot, and the room. peerhour handles the RSVPs and counts the hour toward your service-hour requirement.</p>
+          <p>You pick the topic, the slot, and the room. Reddux handles the RSVPs and counts the hour toward your service-hour requirement.</p>
         </div>
         {user?.role === 'tutor' ? (
           <button className="btn primary lg" onClick={() => setShowHostModal(true)}><Mic size={14} />Propose a lecture</button>

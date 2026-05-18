@@ -33,7 +33,7 @@ export default function HybridShell() {
     <div className="guest-shell">
       <nav className="guest-nav">
         <Link to="/" className="guest-nav-logo serif">
-          peer<em style={{ color: 'var(--accent)' }}>hour</em>
+          Redd<em style={{ color: 'var(--accent)' }}>ux</em>
         </Link>
         <div className="guest-nav-actions">
           <Link to="/login" className="btn">Sign in</Link>

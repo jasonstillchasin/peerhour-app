@@ -56,7 +56,7 @@ export default function Login() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <div className="auth-logo serif">peerhour</div>
+        <div className="auth-logo serif">Reddux</div>
         <h1 className="auth-title">Sign in</h1>
         <p className="auth-sub">Reddam House North Shore peer tutoring</p>
 

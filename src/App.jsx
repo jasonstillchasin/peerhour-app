@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react';
 import { useAuth } from './store/AuthContext.jsx';
 import AppShell from './components/layout/AppShell.jsx';
 import GuestShell from './components/layout/GuestShell.jsx';
@@ -40,40 +41,43 @@ function RequireRole({ role }) {
 
 export default function App() {
   return (
-    <Routes>
-      {/* Guest-only: landing, login, signup */}
-      <Route element={<RequireGuest />}>
-        <Route element={<GuestShell />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-        </Route>
-      </Route>
-
-      {/* Public: lectures visible without login; RSVP requires auth (enforced in Lectures.jsx) */}
-      <Route element={<HybridShell />}>
-        <Route path="/lectures" element={<Lectures />} />
-      </Route>
-
-      {/* Authenticated: all app routes */}
-      <Route element={<RequireAuth />}>
-        <Route element={<AppShell />}>
-          <Route path="/browse" element={<Browse />} />
-          <Route path="/tutor/:id" element={<TutorProfile />} />
-          <Route path="/videos" element={<Videos />} />
-          <Route path="/sessions" element={<MyBookings />} />
-
-          {/* Tutor-only */}
-          <Route element={<RequireRole role="tutor" />}>
-            <Route path="/tutor/dashboard" element={<TutorDash />} />
-            <Route path="/tutor/profile" element={<TutorProfileEdit />} />
-            <Route path="/tutor/availability" element={<Availability />} />
-            <Route path="/tutor/upload" element={<UploadContent />} />
+    <>
+      <Routes>
+        {/* Guest-only: landing, login, signup */}
+        <Route element={<RequireGuest />}>
+          <Route element={<GuestShell />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
           </Route>
         </Route>
-      </Route>
 
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        {/* Public: lectures visible without login; RSVP requires auth (enforced in Lectures.jsx) */}
+        <Route element={<HybridShell />}>
+          <Route path="/lectures" element={<Lectures />} />
+        </Route>
+
+        {/* Authenticated: all app routes */}
+        <Route element={<RequireAuth />}>
+          <Route element={<AppShell />}>
+            <Route path="/browse" element={<Browse />} />
+            <Route path="/tutor/:id" element={<TutorProfile />} />
+            <Route path="/videos" element={<Videos />} />
+            <Route path="/sessions" element={<MyBookings />} />
+
+            {/* Tutor-only */}
+            <Route element={<RequireRole role="tutor" />}>
+              <Route path="/tutor/dashboard" element={<TutorDash />} />
+              <Route path="/tutor/profile" element={<TutorProfileEdit />} />
+              <Route path="/tutor/availability" element={<Availability />} />
+              <Route path="/tutor/upload" element={<UploadContent />} />
+            </Route>
+          </Route>
+        </Route>
+
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+      <Analytics />
+    </>
   );
 }

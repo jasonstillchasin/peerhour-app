@@ -32,7 +32,9 @@ export default function HybridShell() {
   return (
     <div className="guest-shell">
       <nav className="guest-nav">
-        <Link to="/" className="guest-nav-logo serif">
+        <Link to="/" className="guest-nav-logo serif" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <img src="/light.png" className="logo-light-img" alt="" style={{ height: 26, width: 'auto' }} />
+          <img src="/dark.png"  className="logo-dark-img"  alt="" style={{ height: 26, width: 'auto' }} />
           Redd<em style={{ color: 'var(--accent)' }}>ux</em>
         </Link>
         <div className="guest-nav-actions">

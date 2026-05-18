@@ -56,7 +56,7 @@ export default function Login() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <div className="auth-logo serif">Reddux</div>
+        <div className="auth-logo" style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', marginBottom: 4 }}><img src="/light.png" className="logo-light-img" alt="" style={{ height: 36, width: 'auto' }} /><img src="/dark.png" className="logo-dark-img" alt="" style={{ height: 36, width: 'auto' }} /><span className="serif" style={{ fontSize: 26 }}>Redd<em style={{ color: 'var(--accent)' }}>ux</em></span></div>
         <h1 className="auth-title">Sign in</h1>
         <p className="auth-sub">Reddam House North Shore peer tutoring</p>
 

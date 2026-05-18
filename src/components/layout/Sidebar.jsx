@@ -37,6 +37,8 @@ export default function Sidebar({ theme, onToggleTheme }) {
   return (
     <aside className="sidebar">
       <div className="sidebar-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+        <img src="/light.png" className="logo-light-img" alt="" style={{ height: 28, width: 'auto' }} />
+        <img src="/dark.png"  className="logo-dark-img"  alt="" style={{ height: 28, width: 'auto' }} />
         <span className="sidebar-logo-name serif" style={{ fontSize: 20 }}>Redd<em style={{ color: 'var(--accent)' }}>ux</em></span>
       </div>
 

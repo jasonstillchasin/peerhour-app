@@ -202,8 +202,10 @@ export default function Home() {
       {/* ── Top nav ── */}
       <nav className="pub-nav">
         <div className="pub-nav-inner">
-          <Link to="/" style={{ fontFamily: 'var(--font-serif)', fontSize: 24, color: 'var(--fg)', textDecoration: 'none', lineHeight: 1 }}>
-            Redd<em style={{ color: 'var(--accent)' }}>ux</em>
+          <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <img src="/light.png" className="logo-light-img" alt="" style={{ height: 28, width: 'auto' }} />
+            <img src="/dark.png"  className="logo-dark-img"  alt="" style={{ height: 28, width: 'auto' }} />
+            <span style={{ fontFamily: 'var(--font-serif)', fontSize: 22, color: 'var(--fg)', lineHeight: 1 }}>Redd<em style={{ color: 'var(--accent)' }}>ux</em></span>
           </Link>
           <div className="pub-nav-links">
             <a href="#how">How it works</a>

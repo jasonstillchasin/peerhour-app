@@ -5,7 +5,7 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
+    if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
       return res.status(500).json({ error: 'Database not configured.' });
     }
 
@@ -14,8 +14,8 @@ export default async function handler(req, res) {
 
     const norm = email.trim().toLowerCase();
     const kv = new Redis({
-      url: process.env.UPSTASH_REDIS_REST_URL,
-      token: process.env.UPSTASH_REDIS_REST_TOKEN,
+      url: process.env.KV_REST_API_URL,
+      token: process.env.KV_REST_API_TOKEN,
     });
 
     const stored = await kv.get(`otp:${norm}`);

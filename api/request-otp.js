@@ -11,8 +11,8 @@ export default async function handler(req, res) {
     const { email, mode } = req.body ?? {};
     if (!email || !mode) return res.status(400).json({ error: 'Missing email or mode.' });
 
-    if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
-      return res.status(500).json({ error: 'Database not configured. Add UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in Vercel → Settings → Environment Variables.' });
+    if (!process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN) {
+      return res.status(500).json({ error: 'Database not configured. Add KV_REST_API_URL and KV_REST_API_TOKEN in Vercel → Settings → Environment Variables.' });
     }
     if (!process.env.RESEND_API_KEY) {
       return res.status(500).json({ error: 'Email not configured. Add RESEND_API_KEY in Vercel → Settings → Environment Variables.' });
@@ -20,8 +20,8 @@ export default async function handler(req, res) {
 
     const norm = email.trim().toLowerCase();
     const kv = new Redis({
-      url: process.env.UPSTASH_REDIS_REST_URL,
-      token: process.env.UPSTASH_REDIS_REST_TOKEN,
+      url: process.env.KV_REST_API_URL,
+      token: process.env.KV_REST_API_TOKEN,
     });
 
     if (mode === 'signup') {

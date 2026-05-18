@@ -13,7 +13,6 @@ export default function Signup() {
   const [step, setStep] = useState('email'); // 'email' | 'details'
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
-  const [shownCode, setShownCode] = useState('');
   const [name, setName] = useState('');
   const [year, setYear] = useState('');
   const [house, setHouse] = useState('');
@@ -25,8 +24,7 @@ export default function Signup() {
     setError('');
     setLoading(true);
     try {
-      const generated = requestSignupOTP(email.trim());
-      setShownCode(generated);
+      await requestSignupOTP(email.trim());
       setStep('details');
     } catch (err) {
       setError(err.message);
@@ -40,7 +38,7 @@ export default function Signup() {
     setError('');
     setLoading(true);
     try {
-      const user = verifySignupOTP(email.trim(), code.trim(), name, year, house);
+      const user = await verifySignupOTP(email.trim(), code.trim(), name, year, house);
       navigate(user.role === 'tutor' ? '/tutor/dashboard' : '/browse');
     } catch (err) {
       setError(err.message);
@@ -100,13 +98,9 @@ export default function Signup() {
         ) : (
           <form onSubmit={handleCreate} className="auth-form">
             <div style={{ background: 'var(--bg-sunk)', borderRadius: 'var(--radius-md)', padding: '14px 16px', marginBottom: 20, fontSize: 13 }}>
-              <div style={{ color: 'var(--fg-muted)', marginBottom: 4 }}>Code sent to <strong style={{ color: 'var(--fg)' }}>{email}</strong></div>
-              <div style={{ color: 'var(--fg-muted)', fontSize: 12, marginBottom: 10 }}>
-                (Demo mode — no real email sent. Your code is shown below.)
-              </div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 28, letterSpacing: '0.2em', fontWeight: 700, color: 'var(--accent)', textAlign: 'center', padding: '10px 0' }}>
-                {shownCode}
-              </div>
+              <div style={{ color: 'var(--fg-muted)', marginBottom: 2 }}>Code sent to</div>
+              <div style={{ fontWeight: 600, color: 'var(--fg)' }}>{email}</div>
+              <div style={{ color: 'var(--fg-muted)', fontSize: 12, marginTop: 6 }}>Check your inbox — it may take a few seconds.</div>
             </div>
 
             <label className="field-label">Enter your 6-digit code</label>
@@ -140,32 +134,16 @@ export default function Signup() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 14 }}>
               <div>
                 <label className="field-label">Year</label>
-                <select
-                  className="input"
-                  value={year}
-                  onChange={e => setYear(e.target.value)}
-                  required
-                  style={{ marginTop: 6 }}
-                >
+                <select className="input" value={year} onChange={e => setYear(e.target.value)} required style={{ marginTop: 6 }}>
                   <option value="">Select…</option>
-                  {YEARS.map(y => (
-                    <option key={y} value={y}>Year {y}</option>
-                  ))}
+                  {YEARS.map(y => <option key={y} value={y}>Year {y}</option>)}
                 </select>
               </div>
               <div>
                 <label className="field-label">House</label>
-                <select
-                  className="input"
-                  value={house}
-                  onChange={e => setHouse(e.target.value)}
-                  required
-                  style={{ marginTop: 6 }}
-                >
+                <select className="input" value={house} onChange={e => setHouse(e.target.value)} required style={{ marginTop: 6 }}>
                   <option value="">Select…</option>
-                  {HOUSES.map(h => (
-                    <option key={h} value={h}>{h}</option>
-                  ))}
+                  {HOUSES.map(h => <option key={h} value={h}>{h}</option>)}
                 </select>
               </div>
             </div>
@@ -189,7 +167,7 @@ export default function Signup() {
               type="button"
               className="btn"
               style={{ marginTop: 8, width: '100%', justifyContent: 'center', fontSize: 13 }}
-              onClick={() => { setStep('email'); setCode(''); setShownCode(''); setError(''); }}
+              onClick={() => { setStep('email'); setCode(''); setError(''); }}
             >
               ← Use a different email
             </button>

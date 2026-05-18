@@ -1,10 +1,10 @@
 import { Redis } from '@upstash/redis';
+import { Resend } from 'resend';
 
 const kv = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL,
   token: process.env.UPSTASH_REDIS_REST_TOKEN,
 });
-import { Resend } from 'resend';
 
 const ALLOWED_DOMAIN = '@reddamnorthshore.nsw.edu.au';
 const OTP_TTL = 600; // 10 minutes
@@ -35,25 +35,33 @@ export default async function handler(req, res) {
   const code = String(Math.floor(100000 + Math.random() * 900000));
   await kv.set(`otp:${norm}`, code, { ex: OTP_TTL });
 
-  const resend = new Resend(process.env.RESEND_API_KEY);
-  const from = process.env.RESEND_FROM || 'peerhour <onboarding@resend.dev>';
+  if (!process.env.RESEND_API_KEY) {
+    return res.status(500).json({ error: 'Email not configured — add RESEND_API_KEY in Vercel environment variables.' });
+  }
 
-  await resend.emails.send({
-    from,
-    to: norm,
-    subject: 'Your peerhour sign-in code',
-    html: `
-      <div style="font-family:sans-serif;max-width:420px;margin:0 auto;padding:32px 24px">
-        <div style="font-size:22px;font-weight:700;margin-bottom:8px">peerhour</div>
-        <p style="color:#555;margin-bottom:24px">Your one-time sign-in code:</p>
-        <div style="font-size:40px;font-weight:700;letter-spacing:0.18em;text-align:center;
-                    padding:20px;background:#f5f5f5;border-radius:10px;margin-bottom:24px">
-          ${code}
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const from = process.env.RESEND_FROM || 'onboarding@resend.dev';
+
+  try {
+    await resend.emails.send({
+      from,
+      to: norm,
+      subject: 'Your peerhour sign-in code',
+      html: `
+        <div style="font-family:sans-serif;max-width:420px;margin:0 auto;padding:32px 24px">
+          <div style="font-size:22px;font-weight:700;margin-bottom:8px">peerhour</div>
+          <p style="color:#555;margin-bottom:24px">Your one-time sign-in code:</p>
+          <div style="font-size:40px;font-weight:700;letter-spacing:0.18em;text-align:center;
+                      padding:20px;background:#f5f5f5;border-radius:10px;margin-bottom:24px">
+            ${code}
+          </div>
+          <p style="color:#888;font-size:13px">Expires in 10 minutes. If you didn't request this, ignore this email.</p>
         </div>
-        <p style="color:#888;font-size:13px">Expires in 10 minutes. If you didn't request this, you can ignore this email.</p>
-      </div>
-    `,
-  });
+      `,
+    });
+  } catch (err) {
+    return res.status(500).json({ error: `Email failed: ${err.message}` });
+  }
 
   return res.status(200).json({ sent: true });
 }

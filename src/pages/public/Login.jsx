@@ -10,7 +10,6 @@ export default function Login() {
   const [step, setStep] = useState('email'); // 'email' | 'code'
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
-  const [shownCode, setShownCode] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -21,8 +20,7 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      const generated = requestLoginOTP(email.trim());
-      setShownCode(generated);
+      await requestLoginOTP(email.trim());
       setStep('code');
     } catch (err) {
       setError(err.message);
@@ -36,7 +34,7 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      const user = verifyLoginOTP(email.trim(), code.trim());
+      const user = await verifyLoginOTP(email.trim(), code.trim());
       goTo(user.role);
     } catch (err) {
       setError(err.message);
@@ -97,13 +95,9 @@ export default function Login() {
         ) : (
           <form onSubmit={handleVerify} className="auth-form">
             <div style={{ background: 'var(--bg-sunk)', borderRadius: 'var(--radius-md)', padding: '14px 16px', marginBottom: 20, fontSize: 13 }}>
-              <div style={{ color: 'var(--fg-muted)', marginBottom: 4 }}>Code sent to <strong style={{ color: 'var(--fg)' }}>{email}</strong></div>
-              <div style={{ color: 'var(--fg-muted)', fontSize: 12, marginBottom: 10 }}>
-                (Demo mode — no real email sent. Your code is shown below.)
-              </div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 28, letterSpacing: '0.2em', fontWeight: 700, color: 'var(--accent)', textAlign: 'center', padding: '10px 0' }}>
-                {shownCode}
-              </div>
+              <div style={{ color: 'var(--fg-muted)', marginBottom: 2 }}>Code sent to</div>
+              <div style={{ fontWeight: 600, color: 'var(--fg)' }}>{email}</div>
+              <div style={{ color: 'var(--fg-muted)', fontSize: 12, marginTop: 6 }}>Check your inbox — it may take a few seconds.</div>
             </div>
 
             <label className="field-label">Enter your 6-digit code</label>
@@ -140,7 +134,7 @@ export default function Login() {
               type="button"
               className="btn"
               style={{ marginTop: 8, width: '100%', justifyContent: 'center', fontSize: 13 }}
-              onClick={() => { setStep('email'); setCode(''); setShownCode(''); setError(''); }}
+              onClick={() => { setStep('email'); setCode(''); setError(''); }}
             >
               ← Use a different email
             </button>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import { useAuth } from '../../store/AuthContext.jsx';
 import Sidebar from './Sidebar.jsx';
+import MobileNav from './MobileNav.jsx';
 
 // Renders AppShell for logged-in users, simple guest nav for everyone else.
 // Used for routes that should be publicly accessible (e.g. /lectures).
@@ -23,6 +24,7 @@ export default function HybridShell() {
         <main className="main-content">
           <Outlet />
         </main>
+        <MobileNav />
       </div>
     );
   }

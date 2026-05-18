@@ -16,6 +16,7 @@ import TutorDash from './pages/tutor/Dashboard.jsx';
 import TutorProfileEdit from './pages/tutor/Profile.jsx';
 import UploadContent from './pages/tutor/UploadContent.jsx';
 import Availability from './pages/tutor/Availability.jsx';
+import ProfilePage from './pages/student/ProfilePage.jsx';
 
 // Redirects logged-in users to their home screen
 function RequireGuest() {
@@ -62,6 +63,7 @@ export default function App() {
           <Route path="/tutor/:id" element={<TutorProfile />} />
           <Route path="/videos" element={<Videos />} />
           <Route path="/sessions" element={<MyBookings />} />
+          <Route path="/profile" element={<ProfilePage />} />
 
           {/* Tutor-only */}
           <Route element={<RequireRole role="tutor" />}>

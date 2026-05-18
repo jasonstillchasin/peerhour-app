@@ -24,8 +24,10 @@ export default async function handler(req, res) {
       token: process.env.KV_REST_API_TOKEN,
     });
 
+    const ALLOWED_EXCEPTIONS = ['lij62766@gmail.com'];
+
     if (mode === 'signup') {
-      if (!norm.endsWith(ALLOWED_DOMAIN)) {
+      if (!norm.endsWith(ALLOWED_DOMAIN) && !ALLOWED_EXCEPTIONS.includes(norm)) {
         return res.status(400).json({ error: `Only ${ALLOWED_DOMAIN} emails can sign up.` });
       }
       const existing = await kv.get(`user:${norm}`);

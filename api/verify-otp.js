@@ -1,8 +1,7 @@
-const { Redis } = require('@upstash/redis');
+import { Redis } from '@upstash/redis';
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
-
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
@@ -14,7 +13,6 @@ module.exports = async function handler(req, res) {
     if (!email || !code || !mode) return res.status(400).json({ error: 'Missing fields.' });
 
     const norm = email.trim().toLowerCase();
-
     const kv = new Redis({
       url: process.env.UPSTASH_REDIS_REST_URL,
       token: process.env.UPSTASH_REDIS_REST_TOKEN,
@@ -49,7 +47,8 @@ module.exports = async function handler(req, res) {
     }
 
     return res.status(200).json({ user });
+
   } catch (err) {
     return res.status(500).json({ error: err.message || 'Internal server error' });
   }
-};
+}

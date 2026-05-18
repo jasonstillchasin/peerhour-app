@@ -1,23 +1,24 @@
-const { Redis } = require('@upstash/redis');
-const { Resend } = require('resend');
+import { Redis } from '@upstash/redis';
+import { Resend } from 'resend';
 
 const ALLOWED_DOMAIN = '@reddamnorthshore.nsw.edu.au';
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
-
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
-      return res.status(500).json({ error: 'Database not configured — add UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in Vercel environment variables.' });
-    }
-
     const { email, mode } = req.body ?? {};
     if (!email || !mode) return res.status(400).json({ error: 'Missing email or mode.' });
 
-    const norm = email.trim().toLowerCase();
+    if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
+      return res.status(500).json({ error: 'Database not configured. Add UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in Vercel → Settings → Environment Variables.' });
+    }
+    if (!process.env.RESEND_API_KEY) {
+      return res.status(500).json({ error: 'Email not configured. Add RESEND_API_KEY in Vercel → Settings → Environment Variables.' });
+    }
 
+    const norm = email.trim().toLowerCase();
     const kv = new Redis({
       url: process.env.UPSTASH_REDIS_REST_URL,
       token: process.env.UPSTASH_REDIS_REST_TOKEN,
@@ -36,10 +37,6 @@ module.exports = async function handler(req, res) {
 
     const code = String(Math.floor(100000 + Math.random() * 900000));
     await kv.set(`otp:${norm}`, code, { ex: 600 });
-
-    if (!process.env.RESEND_API_KEY) {
-      return res.status(500).json({ error: 'Email not configured — add RESEND_API_KEY in Vercel environment variables.' });
-    }
 
     const resend = new Resend(process.env.RESEND_API_KEY);
     const from = process.env.RESEND_FROM || 'onboarding@resend.dev';
@@ -62,9 +59,9 @@ module.exports = async function handler(req, res) {
     });
 
     if (sendError) return res.status(500).json({ error: `Email failed: ${sendError.message}` });
-
     return res.status(200).json({ sent: true });
+
   } catch (err) {
     return res.status(500).json({ error: err.message || 'Internal server error' });
   }
-};
+}

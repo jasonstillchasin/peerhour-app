@@ -3,17 +3,38 @@ import { useAuth } from '../../store/AuthContext.jsx';
 import { TUTORS, SUBJECTS } from '../../data/index.js';
 import { Check } from '../../components/ui/Icons.jsx';
 
+function load(key, fallback) {
+  try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; }
+}
+function save(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
+}
+
 export default function TutorProfileEdit() {
   const { user } = useAuth();
   const tutor = TUTORS.find(t => t.id === user?.tutorId) || TUTORS[0];
+  const storageKey = `ph_profile_${tutor.id}`;
+
   const [saved, setSaved] = useState(false);
-  const [bio, setBio] = useState(tutor.bio);
-  const [bio2, setBio2] = useState(tutor.bio2 || '');
+  const [bio, setBio] = useState(() => load(storageKey, {}).bio ?? tutor.bio);
+  const [bio2, setBio2] = useState(() => load(storageKey, {}).bio2 ?? (tutor.bio2 || ''));
+  const [units, setUnits] = useState(() => load(storageKey, {}).units ?? (tutor.favoriteUnits?.join(', ') || ''));
+  const [langs, setLangs] = useState(() => load(storageKey, {}).langs ?? (tutor.languages?.join(', ') || ''));
 
   const handleSave = (e) => {
     e.preventDefault();
+    save(storageKey, { bio, bio2, units, langs });
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
+  };
+
+  const handleReset = () => {
+    const defaults = { bio: tutor.bio, bio2: tutor.bio2 || '', units: tutor.favoriteUnits?.join(', ') || '', langs: tutor.languages?.join(', ') || '' };
+    setBio(defaults.bio);
+    setBio2(defaults.bio2);
+    setUnits(defaults.units);
+    setLangs(defaults.langs);
+    save(storageKey, defaults);
   };
 
   return (
@@ -64,7 +85,8 @@ export default function TutorProfileEdit() {
           <label className="field-label">Favourite units / topics</label>
           <input
             className="input"
-            defaultValue={tutor.favoriteUnits?.join(', ')}
+            value={units}
+            onChange={e => setUnits(e.target.value)}
             placeholder="e.g. Series & sequences, Trig identities, Rotational dynamics"
           />
           <div style={{ fontSize: 12, color: 'var(--fg-muted)', marginTop: 4 }}>Comma-separated. Helps students find you for specific topics.</div>
@@ -74,8 +96,9 @@ export default function TutorProfileEdit() {
           <label className="field-label">Languages spoken</label>
           <input
             className="input"
-            defaultValue={tutor.languages?.join(', ')}
-            placeholder="e.g. English, Spanish"
+            value={langs}
+            onChange={e => setLangs(e.target.value)}
+            placeholder="e.g. English, Mandarin"
           />
         </div>
 
@@ -83,8 +106,8 @@ export default function TutorProfileEdit() {
           <button type="submit" className="btn primary lg" style={{ gap: 8 }}>
             {saved ? <><Check size={15} /> Saved!</> : 'Save changes'}
           </button>
-          <button type="button" className="btn lg" onClick={() => { setBio(tutor.bio); setBio2(tutor.bio2 || ''); }}>
-            Reset
+          <button type="button" className="btn lg" onClick={handleReset}>
+            Reset to defaults
           </button>
         </div>
       </form>

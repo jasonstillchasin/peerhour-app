@@ -3,35 +3,32 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { TUTORS, SUBJECTS } from '../../data/index.js';
 import { Search, Star, ChevronRight } from '../../components/ui/Icons.jsx';
 
-const GRADES = ['All years', 'Junior', 'Senior'];
-
 export default function Browse() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const [query, setQuery] = useState('');
   const [subject, setSubject] = useState(params.get('subject') || 'all');
-  const [grade, setGrade] = useState('All years');
 
   const filtered = useMemo(() => {
     return TUTORS.filter(t => {
       const matchSubject = subject === 'all' || t.subjects.includes(subject);
-      const matchGrade = grade === 'All years' || t.year === grade;
       const q = query.toLowerCase();
       const matchQuery = !q ||
         t.name.toLowerCase().includes(q) ||
         t.subjects.some(s => s.includes(q)) ||
-        t.major.toLowerCase().includes(q);
-      return matchSubject && matchGrade && matchQuery;
+        t.major.toLowerCase().includes(q) ||
+        (t.favoriteUnits || []).some(u => u.toLowerCase().includes(q));
+      return matchSubject && matchQuery;
     });
-  }, [query, subject, grade]);
+  }, [query, subject]);
 
   return (
     <div>
       <div className="page-header">
         <div>
-          <div className="eyebrow">Wakefield High · {TUTORS.length} tutors</div>
+          <div className="eyebrow">RHNS · {TUTORS.length} Year 11 tutors</div>
           <h1 className="page-title">Find a <em>tutor</em></h1>
-          <p className="page-sub">Senior students ready to help — every session is free.</p>
+          <p className="page-sub">Year 11 students ready to help — every session is free.</p>
         </div>
       </div>
 
@@ -64,23 +61,12 @@ export default function Browse() {
             </button>
           ))}
         </div>
-
-        <div style={{ display: 'flex', gap: 4 }}>
-          {GRADES.map(g => (
-            <button
-              key={g}
-              className={`chip ${grade === g ? 'active' : ''}`}
-              onClick={() => setGrade(g)}
-            >
-              {g}
-            </button>
-          ))}
-        </div>
       </div>
 
       {filtered.length === 0 && (
         <div style={{ textAlign: 'center', padding: '48px 0', color: 'var(--fg-muted)' }}>
-          No tutors match that filter. <button className="btn" onClick={() => { setQuery(''); setSubject('all'); setGrade('All years'); }}>Clear filters</button>
+          No tutors match that filter.{' '}
+          <button className="btn" onClick={() => { setQuery(''); setSubject('all'); }}>Clear filters</button>
         </div>
       )}
 

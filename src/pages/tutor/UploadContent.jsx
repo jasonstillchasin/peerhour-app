@@ -1,27 +1,52 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { SUBJECTS, RECORDINGS } from '../../data/index.js';
 import { useAuth } from '../../store/AuthContext.jsx';
+import { useAppData } from '../../store/AppDataContext.jsx';
 import { TUTORS } from '../../data/index.js';
 import { Upload, Play, Eye, Check } from '../../components/ui/Icons.jsx';
 
-const LEVELS = ['Foundation', 'Intermediate', 'AP / Advanced'];
+const LEVELS = ['Foundation', 'Intermediate', 'HSC / Advanced'];
 
 export default function UploadContent() {
   const { user } = useAuth();
+  const { uploads, addUpload } = useAppData();
   const tutor = TUTORS.find(t => t.id === user?.tutorId) || TUTORS[0];
-  const myRecordings = RECORDINGS.filter(r => r.tutorId === tutor.id);
+  const myRecordings = [
+    ...RECORDINGS.filter(r => r.tutorId === tutor.id),
+    ...uploads.filter(u => u.tutorId === tutor.id),
+  ];
 
   const [title, setTitle] = useState('');
   const [desc, setDesc] = useState('');
   const [subject, setSubject] = useState(tutor.subjects[0] || 'math');
   const [level, setLevel] = useState('Intermediate');
+  const [fileName, setFileName] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const fileRef = useRef(null);
+
+  const handleFileChange = (e) => {
+    const f = e.target.files?.[0];
+    if (f) setFileName(f.name);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!title || !desc) return;
+    addUpload({
+      tutorId: tutor.id,
+      title,
+      description: desc,
+      subject,
+      level,
+      fileName: fileName || 'recording.mp4',
+      duration: '—',
+    });
     setSubmitted(true);
-    setTimeout(() => { setSubmitted(false); setTitle(''); setDesc(''); }, 3000);
+    setTitle('');
+    setDesc('');
+    setFileName('');
+    if (fileRef.current) fileRef.current.value = '';
+    setTimeout(() => setSubmitted(false), 3000);
   };
 
   return (
@@ -94,11 +119,27 @@ export default function UploadContent() {
 
           <div>
             <label className="field-label">Video file</label>
-            <div className="upload-zone">
+            <div
+              className="upload-zone"
+              style={{ cursor: 'pointer' }}
+              onClick={() => fileRef.current?.click()}
+            >
               <Upload size={32} style={{ color: 'var(--fg-muted)', margin: '0 auto 12px' }} />
-              <p style={{ fontWeight: 500, marginBottom: 4 }}>Drop a video file here or click to browse</p>
-              <p style={{ fontSize: 13, color: 'var(--fg-muted)' }}>MP4, MOV, or WebM · max 2 GB</p>
-              <input type="file" accept="video/*" style={{ display: 'none' }} />
+              {fileName ? (
+                <p style={{ fontWeight: 500, marginBottom: 4, color: 'var(--accent)' }}>{fileName}</p>
+              ) : (
+                <>
+                  <p style={{ fontWeight: 500, marginBottom: 4 }}>Drop a video file here or click to browse</p>
+                  <p style={{ fontSize: 13, color: 'var(--fg-muted)' }}>MP4, MOV, or WebM · max 2 GB</p>
+                </>
+              )}
+              <input
+                ref={fileRef}
+                type="file"
+                accept="video/*"
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+              />
             </div>
           </div>
 
@@ -124,9 +165,9 @@ export default function UploadContent() {
                   </div>
                   <h4 style={{ fontSize: 14, fontWeight: 500, marginBottom: 4 }}>{r.title}</h4>
                   <div style={{ display: 'flex', gap: 12, fontSize: 12, color: 'var(--fg-muted)' }}>
-                    <span><Play size={11} /> {r.duration}</span>
-                    <span><Eye size={11} /> {r.views} views</span>
-                    <span>{r.uploadedAt}</span>
+                    <span><Play size={11} /> {r.duration || '—'}</span>
+                    <span><Eye size={11} /> {r.views ?? 0} views</span>
+                    <span>{r.uploadedAt || 'Just now'}</span>
                   </div>
                 </div>
               ))

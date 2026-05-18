@@ -40,7 +40,7 @@ export default function Login() {
       <div className="auth-card">
         <div className="auth-logo serif">peerhour</div>
         <h1 className="auth-title">Sign in</h1>
-        <p className="auth-sub">Wakefield High peer tutoring</p>
+        <p className="auth-sub">Reddam House North Shore peer tutoring</p>
 
         <form onSubmit={handleSubmit} className="auth-form">
           <label className="field-label">Email</label>
@@ -49,7 +49,7 @@ export default function Login() {
             <input
               type="email"
               className="input"
-              placeholder="you@wakefield.edu"
+              placeholder="you@rhns.nsw.edu.au"
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
@@ -85,9 +85,9 @@ export default function Login() {
           <div className="eyebrow" style={{ marginBottom: 10 }}>Demo accounts</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {[
-              { label: 'Student — Jordan', email: 'jordan@wakefield.edu', pw: 'student123' },
-              { label: 'Tutor — Maya', email: 'maya@wakefield.edu', pw: 'tutor123' },
-              { label: 'Tutor — Rohan', email: 'rohan@wakefield.edu', pw: 'tutor123' },
+              { label: 'Student — Jordan', email: 'jordan@rhns.nsw.edu.au', pw: 'student123' },
+              { label: 'Tutor — Maya', email: 'maya@rhns.nsw.edu.au', pw: 'tutor123' },
+              { label: 'Tutor — Rohan', email: 'rohan@rhns.nsw.edu.au', pw: 'tutor123' },
             ].map(d => (
               <button
                 key={d.email}
@@ -104,11 +104,12 @@ export default function Login() {
         </div>
 
         <p style={{ marginTop: 16, fontSize: 13, color: 'var(--fg-muted)', textAlign: 'center' }}>
-          New student or tutor?{' '}
+          New student?{' '}
           <Link to="/signup" style={{ color: 'var(--accent)' }}>Create an account →</Link>
         </p>
         <p style={{ marginTop: 8, fontSize: 13, color: 'var(--fg-muted)', textAlign: 'center' }}>
-          Just browsing? <Link to="/browse" style={{ color: 'var(--accent)' }}>View tutors →</Link>
+          Just browsing?{' '}
+          <Link to="/lectures" style={{ color: 'var(--accent)' }}>View peer lectures →</Link>
         </p>
       </div>
     </div>

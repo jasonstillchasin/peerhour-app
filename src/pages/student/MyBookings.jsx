@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../store/AuthContext.jsx';
-import { STUDENT_SESSIONS, STUDENT_PAST, TUTORS, SUBJECTS } from '../../data/index.js';
+import { useAppData } from '../../store/AppDataContext.jsx';
+import { STUDENT_PAST, TUTORS } from '../../data/index.js';
 import { Calendar, Clock, Pin, ArrowRight } from '../../components/ui/Icons.jsx';
 
 function SessionRow({ s, past }) {
@@ -15,7 +16,7 @@ function SessionRow({ s, past }) {
       </div>
       <div className="session-body">
         <div className="session-subject">
-          <span className={`chip ${s.subject.toLowerCase()}`}>
+          <span className={`chip ${(s.subject || '').toLowerCase()}`}>
             <span className="chip-dot" />{s.subject}
           </span>
         </div>
@@ -43,7 +44,10 @@ function SessionRow({ s, past }) {
 
 export default function MyBookings() {
   const { user } = useAuth();
+  const { allStudentSessions } = useAppData();
   const navigate = useNavigate();
+
+  const uniqueTutors = [...new Set(allStudentSessions.map(s => s.tutorId))].length;
 
   return (
     <div>
@@ -61,9 +65,9 @@ export default function MyBookings() {
       {/* Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 36 }}>
         {[
-          { v: STUDENT_SESSIONS.length, label: 'upcoming sessions' },
+          { v: allStudentSessions.length, label: 'upcoming sessions' },
           { v: STUDENT_PAST.length, label: 'completed sessions' },
-          { v: TUTORS.filter(t => STUDENT_SESSIONS.some(s => s.tutorId === t.id)).length, label: 'tutors working with' },
+          { v: uniqueTutors, label: 'tutors working with' },
         ].map(s => (
           <div key={s.label} className="stat-card">
             <div className="stat-card-value serif">{s.v}</div>
@@ -73,9 +77,16 @@ export default function MyBookings() {
       </div>
 
       <div className="eyebrow" style={{ marginBottom: 16 }}>Upcoming</div>
-      <div className="sessions-list">
-        {STUDENT_SESSIONS.map(s => <SessionRow key={s.id} s={s} />)}
-      </div>
+      {allStudentSessions.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--fg-muted)' }}>
+          <p style={{ marginBottom: 16 }}>No upcoming sessions yet.</p>
+          <button className="btn primary" onClick={() => navigate('/browse')}>Find a tutor</button>
+        </div>
+      ) : (
+        <div className="sessions-list">
+          {allStudentSessions.map(s => <SessionRow key={s.id} s={s} />)}
+        </div>
+      )}
 
       {STUDENT_PAST.length > 0 && (
         <>

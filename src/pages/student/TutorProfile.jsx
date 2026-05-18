@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { TUTORS, SUBJECTS, SLOTS, DAYS, DAY_NUMS, HOURS } from '../../data/index.js';
 import { useAuth } from '../../store/AuthContext.jsx';
+import { useAppData } from '../../store/AppDataContext.jsx';
 import { Star, ArrowLeft, Calendar, Clock, Pin, Check } from '../../components/ui/Icons.jsx';
 
 function SlotCell({ dayIdx, hour, slots, selected, onSelect }) {
@@ -32,12 +33,14 @@ export default function TutorProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { addBooking } = useAppData();
   const tutor = TUTORS.find(t => t.id === id);
   const [selected, setSelected] = useState(null);
   const [subject, setSubject] = useState('');
   const [topic, setTopic] = useState('');
   const [location, setLocation] = useState('Library');
   const [confirmed, setConfirmed] = useState(false);
+  const [guestPrompt, setGuestPrompt] = useState(false);
 
   if (!tutor) return (
     <div style={{ padding: 48, textAlign: 'center' }}>
@@ -47,8 +50,25 @@ export default function TutorProfile() {
   );
 
   const tutorSlots = SLOTS[tutor.id] || {};
+
+  const handleSelect = (slot) => {
+    if (!user) { setGuestPrompt(true); return; }
+    setSelected(slot);
+    setGuestPrompt(false);
+  };
+
   const handleConfirm = () => {
     if (!selected || !subject) return;
+    addBooking({
+      tutorId: tutor.id,
+      subject: SUBJECTS.find(s => s.id === subject)?.name || subject,
+      topic: topic || 'General help',
+      day: DAYS[selected.day],
+      dom: DAY_NUMS[selected.day],
+      month: 'May',
+      time: `${HOURS[selected.hour]} – 1 hour`,
+      location,
+    });
     setConfirmed(true);
   };
 
@@ -153,6 +173,21 @@ export default function TutorProfile() {
 
         {/* Right column — calendar + booking */}
         <div>
+          {!user && (
+            <div style={{ marginBottom: 16, padding: '12px 16px', background: 'var(--bg-elev)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', fontSize: 14 }}>
+              <Link to="/login" style={{ color: 'var(--accent)', fontWeight: 500 }}>Sign in</Link>
+              {' '}or{' '}
+              <Link to="/signup" style={{ color: 'var(--accent)', fontWeight: 500 }}>create an account</Link>
+              {' '}to book a session with {tutor.name.split(' ')[0]}.
+            </div>
+          )}
+
+          {guestPrompt && (
+            <div style={{ marginBottom: 12, padding: '10px 14px', background: 'var(--danger-wash)', borderRadius: 'var(--radius-md)', fontSize: 13, color: 'var(--danger)' }}>
+              You need to <Link to="/login" style={{ color: 'var(--accent)', fontWeight: 500 }}>sign in</Link> to select a slot and book a session.
+            </div>
+          )}
+
           <div className="eyebrow" style={{ marginBottom: 12 }}>Availability — week of May 19</div>
           <div className="cal-wrap">
             <div className="cal-header">
@@ -175,7 +210,7 @@ export default function TutorProfile() {
                       hour={hi}
                       slots={tutorSlots[di]}
                       selected={selected}
-                      onSelect={setSelected}
+                      onSelect={handleSelect}
                     />
                   ))}
                 </div>
@@ -188,7 +223,7 @@ export default function TutorProfile() {
           </div>
 
           {/* Booking form */}
-          {selected && (
+          {selected && user && (
             <div className="booking-panel">
               <div className="eyebrow" style={{ marginBottom: 14 }}>Book session</div>
               <div className="booking-slot-summary">

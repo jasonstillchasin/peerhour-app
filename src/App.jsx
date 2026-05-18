@@ -2,6 +2,7 @@ import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from './store/AuthContext.jsx';
 import AppShell from './components/layout/AppShell.jsx';
 import GuestShell from './components/layout/GuestShell.jsx';
+import HybridShell from './components/layout/HybridShell.jsx';
 
 import Home from './pages/public/Home.jsx';
 import Login from './pages/public/Login.jsx';
@@ -49,12 +50,16 @@ export default function App() {
         </Route>
       </Route>
 
+      {/* Public: lectures visible without login; RSVP requires auth (enforced in Lectures.jsx) */}
+      <Route element={<HybridShell />}>
+        <Route path="/lectures" element={<Lectures />} />
+      </Route>
+
       {/* Authenticated: all app routes */}
       <Route element={<RequireAuth />}>
         <Route element={<AppShell />}>
           <Route path="/browse" element={<Browse />} />
           <Route path="/tutor/:id" element={<TutorProfile />} />
-          <Route path="/lectures" element={<Lectures />} />
           <Route path="/videos" element={<Videos />} />
           <Route path="/sessions" element={<MyBookings />} />
 

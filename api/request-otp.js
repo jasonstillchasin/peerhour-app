@@ -1,49 +1,50 @@
-import { Redis } from '@upstash/redis';
-import { Resend } from 'resend';
-
-const kv = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN,
-});
+const { Redis } = require('@upstash/redis');
+const { Resend } = require('resend');
 
 const ALLOWED_DOMAIN = '@reddamnorthshore.nsw.edu.au';
-const OTP_TTL = 600; // 10 minutes
 
-export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).end();
+module.exports = async function handler(req, res) {
+  res.setHeader('Content-Type', 'application/json');
 
-  const { email, mode } = req.body ?? {};
-  if (!email || !mode) return res.status(400).json({ error: 'Missing email or mode.' });
-
-  const norm = email.trim().toLowerCase();
-
-  if (mode === 'signup') {
-    if (!norm.endsWith(ALLOWED_DOMAIN)) {
-      return res.status(400).json({ error: `Only ${ALLOWED_DOMAIN} emails can sign up.` });
-    }
-    const existing = await kv.get(`user:${norm}`);
-    if (existing) {
-      return res.status(400).json({ error: 'Account already exists. Sign in instead.' });
-    }
-  } else {
-    const existing = await kv.get(`user:${norm}`);
-    if (!existing) {
-      return res.status(400).json({ error: 'No account found for that email. Sign up instead.' });
-    }
-  }
-
-  const code = String(Math.floor(100000 + Math.random() * 900000));
-  await kv.set(`otp:${norm}`, code, { ex: OTP_TTL });
-
-  if (!process.env.RESEND_API_KEY) {
-    return res.status(500).json({ error: 'Email not configured — add RESEND_API_KEY in Vercel environment variables.' });
-  }
-
-  const resend = new Resend(process.env.RESEND_API_KEY);
-  const from = process.env.RESEND_FROM || 'onboarding@resend.dev';
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    await resend.emails.send({
+    if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
+      return res.status(500).json({ error: 'Database not configured — add UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in Vercel environment variables.' });
+    }
+
+    const { email, mode } = req.body ?? {};
+    if (!email || !mode) return res.status(400).json({ error: 'Missing email or mode.' });
+
+    const norm = email.trim().toLowerCase();
+
+    const kv = new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN,
+    });
+
+    if (mode === 'signup') {
+      if (!norm.endsWith(ALLOWED_DOMAIN)) {
+        return res.status(400).json({ error: `Only ${ALLOWED_DOMAIN} emails can sign up.` });
+      }
+      const existing = await kv.get(`user:${norm}`);
+      if (existing) return res.status(400).json({ error: 'Account already exists. Sign in instead.' });
+    } else {
+      const existing = await kv.get(`user:${norm}`);
+      if (!existing) return res.status(400).json({ error: 'No account found for that email. Sign up instead.' });
+    }
+
+    const code = String(Math.floor(100000 + Math.random() * 900000));
+    await kv.set(`otp:${norm}`, code, { ex: 600 });
+
+    if (!process.env.RESEND_API_KEY) {
+      return res.status(500).json({ error: 'Email not configured — add RESEND_API_KEY in Vercel environment variables.' });
+    }
+
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    const from = process.env.RESEND_FROM || 'onboarding@resend.dev';
+
+    const { error: sendError } = await resend.emails.send({
       from,
       to: norm,
       subject: 'Your peerhour sign-in code',
@@ -55,13 +56,15 @@ export default async function handler(req, res) {
                       padding:20px;background:#f5f5f5;border-radius:10px;margin-bottom:24px">
             ${code}
           </div>
-          <p style="color:#888;font-size:13px">Expires in 10 minutes. If you didn't request this, ignore this email.</p>
+          <p style="color:#888;font-size:13px">Expires in 10 minutes.</p>
         </div>
       `,
     });
-  } catch (err) {
-    return res.status(500).json({ error: `Email failed: ${err.message}` });
-  }
 
-  return res.status(200).json({ sent: true });
-}
+    if (sendError) return res.status(500).json({ error: `Email failed: ${sendError.message}` });
+
+    return res.status(200).json({ sent: true });
+  } catch (err) {
+    return res.status(500).json({ error: err.message || 'Internal server error' });
+  }
+};

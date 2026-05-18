@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from 'react';
-import { STUDENT_SESSIONS } from '../data/index.js';
+import { STUDENT_SESSIONS, STUDENT_PAST, TUTOR_SESSIONS } from '../data/index.js';
 
 const AppDataContext = createContext(null);
 
@@ -12,6 +12,9 @@ function save(key, val) {
 
 export function AppDataProvider({ children }) {
   const [bookings, setBookings] = useState(() => load('ph_bookings', []));
+  const [cancelledIds, setCancelledIds] = useState(() => load('ph_cancelled', []));
+  const [tutorSessionsList, setTutorSessionsList] = useState(() => load('ph_tutor_sessions', TUTOR_SESSIONS));
+  const [ratings, setRatings] = useState(() => load('ph_ratings', {}));
   const [rsvps, setRsvps] = useState(() => load('ph_rsvp', { L1: true }));
   const [savedVideos, setSavedVideos] = useState(() => load('ph_saved_videos', { V5: true }));
   const [uploads, setUploads] = useState(() => load('ph_uploads', []));
@@ -24,8 +27,41 @@ export function AppDataProvider({ children }) {
     });
   };
 
-  // Merge persisted bookings with mock seed data
-  const allStudentSessions = [...STUDENT_SESSIONS, ...bookings];
+  const cancelStudentSession = (id) => {
+    setBookings(b => {
+      const next = b.filter(bk => bk.id !== id);
+      save('ph_bookings', next);
+      return next;
+    });
+    setCancelledIds(c => {
+      const next = [...c, id];
+      save('ph_cancelled', next);
+      return next;
+    });
+  };
+
+  const cancelTutorSession = (id) => {
+    setTutorSessionsList(s => {
+      const next = s.filter(ts => ts.id !== id);
+      save('ph_tutor_sessions', next);
+      return next;
+    });
+  };
+
+  const addRating = (sessionId, rating) => {
+    setRatings(r => {
+      const next = { ...r, [sessionId]: rating };
+      save('ph_ratings', next);
+      return next;
+    });
+  };
+
+  const allStudentSessions = [...STUDENT_SESSIONS, ...bookings].filter(
+    s => !cancelledIds.includes(s.id)
+  );
+
+  // Past sessions that haven't been rated yet (skip dismissed ones too)
+  const unratedPastSessions = STUDENT_PAST.filter(s => !ratings[s.id]);
 
   const toggleRsvp = (id) => {
     setRsvps(r => {
@@ -59,6 +95,9 @@ export function AppDataProvider({ children }) {
   return (
     <AppDataContext.Provider value={{
       bookings, addBooking, allStudentSessions,
+      cancelStudentSession,
+      tutorSessionsList, cancelTutorSession,
+      ratings, addRating, unratedPastSessions,
       rsvps, toggleRsvp,
       savedVideos, toggleSavedVideo,
       uploads, addUpload,

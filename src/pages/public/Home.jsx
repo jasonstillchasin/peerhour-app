@@ -142,13 +142,14 @@ function CountUp({ to, decimals = 0 }) {
 }
 
 // ── Data ─────────────────────────────────────────────────────────────────────
+// First 4 in TUTORS are the featured ones: Jason, Bach, Alex, Aadi
 const FEATURED = TUTORS.slice(0, 4);
 
 const SUBJECTS_4 = [
-  { name: 'Math',      icon: '∫',   bg: 'math-bg',    meta: 'Ext 1 & 2 Maths · Preliminary Maths · Linear algebra', count: 14 },
-  { name: 'English',   icon: '¶',   bg: 'english-bg', meta: 'HSC English Advanced · Extension · Uni applications',   count: 9  },
-  { name: 'Sciences',  icon: 'α',   bg: 'science-bg', meta: 'HSC Biology · Chemistry · Physics',                     count: 12 },
-  { name: 'Computing', icon: '{ }', bg: 'cs-bg',      meta: 'SDD · Web · Python · Robotics',                         count: 7, mono: true },
+  { name: 'Maths',     icon: '∫',   bg: 'math-bg',    meta: 'Ext 1 & 2 Maths · Preliminary Maths · Commerce',       count: 14 },
+  { name: 'English',   icon: '¶',   bg: 'english-bg', meta: 'HSC English Advanced · History · Uni applications',     count: 9  },
+  { name: 'Sciences',  icon: 'α',   bg: 'science-bg', meta: 'HSC Biology · Chemistry · Physics · PDHPE',             count: 12 },
+  { name: 'Computing', icon: '{ }', bg: 'cs-bg',      meta: 'SDD · Web · Python · Flexible sessions',               count: 7, mono: true },
 ];
 
 const TITLE_WORDS = [
@@ -167,9 +168,9 @@ const TITLE_WORDS = [
 ];
 
 const HERO_CARDS = [
-  { tutor: FEATURED[0], meta: 'Ext 2 Maths · free at 3:30 today', cls: 'hero-card-1' },
-  { tutor: FEATURED[1], meta: 'SDD · free Wed 4pm',               cls: 'hero-card-2' },
-  { tutor: FEATURED[2], meta: 'HSC English · 2 slots left',       cls: 'hero-card-3' },
+  { tutor: FEATURED[0], meta: 'Maths · Physics · free tomorrow 4pm', cls: 'hero-card-1' },
+  { tutor: FEATURED[1], meta: 'Flexible · all subjects · open today', cls: 'hero-card-2' },
+  { tutor: FEATURED[2], meta: 'Maths · Science · free Wed 3:30',      cls: 'hero-card-3' },
 ];
 
 // ── Page ─────────────────────────────────────────────────────────────────────
@@ -349,7 +350,7 @@ export default function Home() {
               </p>
             </div>
           </Reveal>
-          <Reveal stagger as="div" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14 }}>
+          <Reveal stagger as="div" className="home-subjects-grid">
             {SUBJECTS_4.map(s => (
               <button
                 key={s.name}

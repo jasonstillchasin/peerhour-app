@@ -39,7 +39,7 @@ export default async function handler(req, res) {
     await kv.set(`otp:${norm}`, code, { ex: 600 });
 
     const resend = new Resend(process.env.RESEND_API_KEY);
-    const from = process.env.RESEND_FROM || 'onboarding@resend.dev';
+    const from = 'onboarding@resend.dev';
 
     const { error: sendError } = await resend.emails.send({
       from,

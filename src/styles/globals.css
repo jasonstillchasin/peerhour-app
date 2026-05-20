@@ -982,6 +982,25 @@ a { color: inherit; text-decoration: none; }
   /* Rating modal */
   .rating-modal { padding: 24px 18px 20px; }
   .rating-star { font-size: 28px; }
+
+  /* Guest nav + home wrap */
+  .guest-nav { padding: 0 16px; }
+  .guest-home-wrap { padding: 0 16px; }
+
+  /* Upload form: stack sidebar below form on mobile */
+  .upload-layout { grid-template-columns: 1fr !important; }
+
+  /* Confirm-card on mobile */
+  .confirm-card { padding: 28px 20px; }
+
+  /* Page title clamp */
+  .page-title { font-size: clamp(28px, 8vw, 48px); }
+
+  /* Tutor profile aside: reduce avatar crowding */
+  .profile-aside { padding-bottom: 24px; }
+
+  /* Vid filterbar chip row always scrollable */
+  .vid-filterbar .chip-row { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
 }
 
 /* Very small (≤ 400px) */
@@ -1397,7 +1416,7 @@ a { color: inherit; text-decoration: none; }
 .vid-hero-info { display: flex; flex-direction: column; gap: 14px; padding-top: 4px; }
 .vid-hero-tags { display: flex; flex-wrap: wrap; gap: 6px; }
 .vid-hero-tags .pill { display: inline-flex; align-items: center; gap: 4px; }
-.vid-hero-title { font-size: 32px; line-height: 1.1; letter-spacing: -0.015em; margin: 0; }
+.vid-hero-title { font-size: clamp(22px, 3.5vw, 32px); line-height: 1.1; letter-spacing: -0.015em; margin: 0; }
 .vid-hero-blurb { color: var(--fg-muted); font-size: 15px; line-height: 1.55; margin: 0; }
 .vid-hero-presenter { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg-elev); text-align: left; cursor: pointer; transition: all 0.12s; }
 .vid-hero-presenter:hover { border-color: var(--border-strong); }
@@ -1460,7 +1479,11 @@ a { color: inherit; text-decoration: none; }
 }
 @media (max-width: 720px) {
   .vid-hero { grid-template-columns: 1fr; }
-  .vid-filterbar { grid-template-columns: 1fr; }
+  .vid-filterbar { grid-template-columns: 1fr; gap: 12px; }
+  .vid-tally { display: none; }
   .vid-record-cta { grid-template-columns: 1fr; text-align: center; }
   .vid-record-art { justify-self: center; }
+  .vid-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+  .vid-hero-actions { flex-wrap: nowrap; }
+  .vid-hero-actions .btn { flex: 1; justify-content: center; font-size: 13px; padding: 9px 12px; }
 }

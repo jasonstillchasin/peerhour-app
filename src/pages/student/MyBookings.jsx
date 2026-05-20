@@ -7,11 +7,17 @@ import { Clock, Pin, ArrowRight } from '../../components/ui/Icons.jsx';
 function SessionRow({ s, past, onCancel }) {
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
+  const [confirming, setConfirming] = useState(false);
   const tutor = TUTORS.find(t => t.id === s.tutorId);
 
   const handleCancel = (e) => {
     e.stopPropagation();
-    if (window.confirm('Cancel this session?')) onCancel(s.id);
+    setConfirming(true);
+  };
+
+  const handleConfirmCancel = (e) => {
+    e.stopPropagation();
+    onCancel(s.id);
   };
 
   const handleReschedule = (e) => {
@@ -65,16 +71,32 @@ function SessionRow({ s, past, onCancel }) {
 
       {expanded && !past && (
         <div className="session-expand-actions" onClick={e => e.stopPropagation()}>
-          <button className="btn" style={{ fontSize: 13 }} onClick={handleReschedule}>
-            Reschedule
-          </button>
-          <button
-            className="btn"
-            style={{ fontSize: 13, color: 'var(--danger, #c0392b)', borderColor: 'var(--danger, #c0392b)' }}
-            onClick={handleCancel}
-          >
-            Cancel session
-          </button>
+          {confirming ? (
+            <>
+              <span style={{ fontSize: 13, color: 'var(--fg-muted)' }}>Cancel this session?</span>
+              <button className="btn" style={{ fontSize: 13 }} onClick={e => { e.stopPropagation(); setConfirming(false); }}>Keep it</button>
+              <button
+                className="btn"
+                style={{ fontSize: 13, color: 'var(--danger, #c0392b)', borderColor: 'var(--danger, #c0392b)' }}
+                onClick={handleConfirmCancel}
+              >
+                Yes, cancel
+              </button>
+            </>
+          ) : (
+            <>
+              <button className="btn" style={{ fontSize: 13 }} onClick={handleReschedule}>
+                Reschedule
+              </button>
+              <button
+                className="btn"
+                style={{ fontSize: 13, color: 'var(--danger, #c0392b)', borderColor: 'var(--danger, #c0392b)' }}
+                onClick={handleCancel}
+              >
+                Cancel session
+              </button>
+            </>
+          )}
         </div>
       )}
     </div>

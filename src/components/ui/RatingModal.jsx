@@ -12,6 +12,8 @@ function StarRow({ value, onChange }) {
           className={`rating-star${n <= (hover || value) ? ' active' : ''}`}
           onMouseEnter={() => setHover(n)}
           onMouseLeave={() => setHover(0)}
+          onTouchStart={() => setHover(n)}
+          onTouchEnd={() => { onChange(n); setHover(0); }}
           onClick={() => onChange(n)}
           aria-label={`${n} star${n > 1 ? 's' : ''}`}
         >

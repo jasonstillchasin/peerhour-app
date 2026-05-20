@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { STUDENT_SESSIONS, STUDENT_PAST, TUTOR_SESSIONS, PEER_LECTURES } from '../data/index.js';
 
 const AppDataContext = createContext(null);
@@ -65,12 +65,16 @@ export function AppDataProvider({ children }) {
     });
   };
 
-  const allStudentSessions = [...STUDENT_SESSIONS, ...bookings].filter(
-    s => !cancelledIds.includes(s.id)
+  const allStudentSessions = useMemo(
+    () => [...STUDENT_SESSIONS, ...bookings].filter(s => !cancelledIds.includes(s.id)),
+    [bookings, cancelledIds]
   );
 
   // Past sessions that haven't been rated yet (skip dismissed ones too)
-  const unratedPastSessions = STUDENT_PAST.filter(s => !ratings[s.id]);
+  const unratedPastSessions = useMemo(
+    () => STUDENT_PAST.filter(s => !ratings[s.id]),
+    [ratings]
+  );
 
   const toggleRsvp = (id, userEmail) => {
     const joining = !rsvps[id];

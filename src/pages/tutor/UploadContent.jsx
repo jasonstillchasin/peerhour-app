@@ -21,24 +21,34 @@ export default function UploadContent() {
   const [subject, setSubject] = useState(tutor.subjects[0] || 'math');
   const [level, setLevel] = useState('Intermediate');
   const [fileName, setFileName] = useState('');
+  const [fileError, setFileError] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const fileRef = useRef(null);
 
+  const MAX_SIZE = 2 * 1024 * 1024 * 1024; // 2 GB
+
   const handleFileChange = (e) => {
     const f = e.target.files?.[0];
-    if (f) setFileName(f.name);
+    if (!f) return;
+    if (f.size > MAX_SIZE) {
+      setFileError('File exceeds 2 GB limit. Please compress the video first.');
+      if (fileRef.current) fileRef.current.value = '';
+      return;
+    }
+    setFileError('');
+    setFileName(f.name);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!title || !desc) return;
+    if (!title || !desc || !fileName) return;
     addUpload({
       tutorId: tutor.id,
       title,
       description: desc,
       subject,
       level,
-      fileName: fileName || 'recording.mp4',
+      fileName,
       duration: '—',
     });
     setSubmitted(true);
@@ -59,7 +69,7 @@ export default function UploadContent() {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 32, alignItems: 'start' }}>
+      <div className="upload-layout" style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 32, alignItems: 'start' }}>
         {/* Upload form */}
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           <div>
@@ -141,9 +151,12 @@ export default function UploadContent() {
                 onChange={handleFileChange}
               />
             </div>
+            {fileError && (
+              <p style={{ fontSize: 13, color: 'var(--danger, #c0392b)', marginTop: 8 }}>{fileError}</p>
+            )}
           </div>
 
-          <button type="submit" className="btn primary lg" style={{ justifyContent: 'center' }}>
+          <button type="submit" className="btn primary lg" style={{ justifyContent: 'center' }} disabled={!title || !desc || !fileName}>
             {submitted ? <><Check size={15} /> Submitted!</> : <><Upload size={15} /> Upload video</>}
           </button>
         </form>

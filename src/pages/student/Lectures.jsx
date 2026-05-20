@@ -14,7 +14,11 @@ function Modal({ onClose, children }) {
   useEffect(() => {
     const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose(); };
     document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+    document.addEventListener('touchstart', handler, { passive: true });
+    return () => {
+      document.removeEventListener('mousedown', handler);
+      document.removeEventListener('touchstart', handler);
+    };
   }, [onClose]);
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
@@ -113,7 +117,15 @@ export default function Lectures() {
 
   const filtered = filter === 'all' ? PEER_LECTURES : PEER_LECTURES.filter(l => l.subject === filter);
   const featured = PEER_LECTURES.find(l => l.featured);
-  const rest = filtered.filter(l => !l.featured || filter !== 'all');
+
+  // Classify lectures by week: 19-25 = this week, 26-31 = next week, <19 = past
+  const viewFiltered = filtered.filter(l => {
+    if (view === 'upcoming') return l.dom >= 19 && l.dom <= 25;
+    if (view === 'calendar') return l.dom >= 26;
+    if (view === 'past')     return l.dom < 19;
+    return true;
+  });
+  const rest = viewFiltered.filter(l => !l.featured || filter !== 'all');
 
   const grouped = [];
   const seen = {};
@@ -359,8 +371,9 @@ export default function Lectures() {
       <div className="lec-days">
         {grouped.length === 0 && (
           <div className="empty">
-            No lectures matching that subject this week.{' '}
-            <button className="btn" onClick={() => setShowSuggestModal(true)}>Suggest one →</button>
+            {view === 'past' && 'No past lectures recorded yet.'}
+            {view === 'calendar' && <>No lectures scheduled for next week yet. <button className="btn" onClick={() => setShowSuggestModal(true)}>Suggest one →</button></>}
+            {view === 'upcoming' && <>No lectures matching that subject this week. <button className="btn" onClick={() => setShowSuggestModal(true)}>Suggest one →</button></>}
           </div>
         )}
         {grouped.map(d => (

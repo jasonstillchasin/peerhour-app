@@ -424,9 +424,9 @@ export const STUDENT_PAST = [
 ];
 
 export const TUTOR_SESSIONS = [
-  { id:'t1', studentName:'Jordan Pierce', studentInitials:'JP', studentColor:'avatar-c2', subject:'Maths', topic:'Series convergence', day:'Thu', dom:22, month:'May', time:'3:30–4:30 PM' },
-  { id:'t2', studentName:'Priya Shah', studentInitials:'PS', studentColor:'avatar-c5', subject:'Physics', topic:'Rotational dynamics', day:'Fri', dom:23, month:'May', time:'4:00–5:00 PM' },
-  { id:'t3', studentName:'Marcus Lin', studentInitials:'ML', studentColor:'avatar-c3', subject:'Maths', topic:'Integration by parts', day:'Mon', dom:26, month:'May', time:'3:00–4:00 PM' },
+  { id:'t1', studentName:'Jordan Pierce', studentInitials:'JP', studentColor:'avatar-c2', studentEmail:'jordan@rhns.nsw.edu.au', subject:'Maths', topic:'Series convergence', day:'Thu', dom:22, month:'May', time:'3:30–4:30 PM' },
+  { id:'t2', studentName:'Priya Shah', studentInitials:'PS', studentColor:'avatar-c5', studentEmail:'priya@rhns.nsw.edu.au', subject:'Physics', topic:'Rotational dynamics', day:'Fri', dom:23, month:'May', time:'4:00–5:00 PM' },
+  { id:'t3', studentName:'Marcus Lin', studentInitials:'ML', studentColor:'avatar-c3', studentEmail:'marcus@rhns.nsw.edu.au', subject:'Maths', topic:'Integration by parts', day:'Mon', dom:26, month:'May', time:'3:00–4:00 PM' },
 ];
 
 // Mock users — in production replace with real auth

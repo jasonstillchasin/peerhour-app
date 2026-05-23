@@ -7,6 +7,7 @@ import { Calendar, Clock, Users, Star, Plus } from '../../components/ui/Icons.js
 
 function TutorSessionRow({ s, onCancel }) {
   const [expanded, setExpanded] = useState(false);
+  const navigate = useNavigate();
 
   const handleCancel = (e) => {
     e.stopPropagation();
@@ -16,30 +17,40 @@ function TutorSessionRow({ s, onCancel }) {
   return (
     <div className="session-row" onClick={() => setExpanded(v => !v)}>
       <div className="session-row-main">
-        <div className="session-date">
-          <div className="session-dom">{s.dom}</div>
-          <div className="session-mon">{s.month}</div>
-          <div className="session-day">{s.day}</div>
+        <div className="session-left">
+          <div className="session-date">
+            <div className="session-dom">{s.dom}</div>
+            <div className="session-mon">{s.month}</div>
+            <div className="session-day">{s.day}</div>
+          </div>
+
+          <div className="session-body">
+            <div className="session-subject">
+              <span className={`chip ${s.subject.toLowerCase()}`}><span className="chip-dot" />{s.subject}</span>
+            </div>
+            <div className="session-topic">{s.topic}</div>
+            <div className="session-meta">
+              <Clock size={12} />
+              <span>{s.time}</span>
+            </div>
+          </div>
         </div>
 
-        <div className="session-body">
-          <div className="session-subject">
-            <span className={`chip ${s.subject.toLowerCase()}`}><span className="chip-dot" />{s.subject}</span>
-          </div>
-          <div className="session-topic">{s.topic}</div>
-          <div className="session-meta">
-            <Clock size={12} />
-            <span>{s.time}</span>
-          </div>
-        </div>
-
-        <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
+        <button
+          className="session-tutor"
+          onClick={(e) => {
+            e.stopPropagation();
+            const base = encodeURIComponent(s.studentEmail || '');
+            const name = encodeURIComponent(s.studentName || '');
+            navigate(`/tutor/student/${base}?name=${name}`);
+          }}
+        >
           <div className={`avatar sm ${s.studentColor}`}>{s.studentInitials}</div>
           <div>
-            <div style={{ fontSize: 13, fontWeight: 500 }}>{s.studentName}</div>
-            <div style={{ fontSize: 11, color: 'var(--fg-muted)' }}>Student</div>
+            <div className="session-tutor-name">{s.studentName}</div>
+            <div className="session-tutor-sub">View profile →</div>
           </div>
-        </div>
+        </button>
       </div>
 
       {expanded && (

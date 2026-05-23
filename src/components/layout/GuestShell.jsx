@@ -8,7 +8,11 @@ export default function GuestShell() {
     <div className="guest-shell">
       {!isHome && (
         <nav className="guest-nav">
-          <Link to="/" className="guest-nav-logo serif">peerhour</Link>
+          <Link to="/" className="guest-nav-logo" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}>
+            <img src="/light.png" className="logo-light-img" alt="" style={{ height: 28, width: 'auto' }} />
+            <img src="/dark.png" className="logo-dark-img" alt="" style={{ height: 28, width: 'auto' }} />
+            <span className="serif" style={{ fontSize: 20 }}>Redd<em style={{ color: 'var(--accent)' }}>ux</em></span>
+          </Link>
           <div className="guest-nav-actions">
             {pathname !== '/login' && (
               <Link to="/login" className="btn">Sign in</Link>

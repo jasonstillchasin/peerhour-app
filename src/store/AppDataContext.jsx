@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { STUDENT_SESSIONS, STUDENT_PAST, TUTOR_SESSIONS, PEER_LECTURES } from '../data/index.js';
+import { useAuth } from './AuthContext.jsx';
 
 const AppDataContext = createContext(null);
 
@@ -11,12 +12,32 @@ function save(key, val) {
 }
 
 export function AppDataProvider({ children }) {
-  const [bookings, setBookings] = useState(() => load('ph_bookings', []));
-  const [cancelledIds, setCancelledIds] = useState(() => load('ph_cancelled', []));
+  const { user } = useAuth();
+  // Keyed per user so accounts don't bleed into each other on shared devices
+  const bookingKey = user?.email ? `ph_bookings:${user.email}` : 'ph_bookings';
+  const cancelKey  = user?.email ? `ph_cancelled:${user.email}` : 'ph_cancelled';
+  const [bookings, setBookings] = useState(() => load(bookingKey, []));
+  const [cancelledIds, setCancelledIds] = useState(() => load(cancelKey, []));
   const [tutorSessionsList, setTutorSessionsList] = useState(() => load('ph_tutor_sessions', TUTOR_SESSIONS));
   const [ratings, setRatings] = useState(() => load('ph_ratings', {}));
   const [rsvps, setRsvps] = useState(() => load('ph_rsvp', {}));
   const [rsvpCounts, setRsvpCounts] = useState({});
+
+  // Load bookings from Redis when user is known — Redis is authoritative, replaces local state
+  useEffect(() => {
+    if (!user?.email) return;
+    const key = `ph_bookings:${user.email}`;
+    fetch(`/api/bookings?userEmail=${encodeURIComponent(user.email)}`)
+      .then(r => r.json())
+      .then(data => {
+        if (!data.error) {
+          const remote = data.bookings ?? [];
+          setBookings(remote);
+          save(key, remote);
+        }
+      })
+      .catch(() => {});
+  }, [user?.email]);
 
   useEffect(() => {
     const ids = PEER_LECTURES.map(l => l.id).join(',');
@@ -29,24 +50,37 @@ export function AppDataProvider({ children }) {
   const [uploads, setUploads] = useState(() => load('ph_uploads', []));
 
   const addBooking = (booking) => {
+    const newBooking = { ...booking, id: `bk-${Date.now()}`, status: 'upcoming' };
     setBookings(b => {
-      const next = [...b, { ...booking, id: `bk-${Date.now()}`, status: 'upcoming' }];
-      save('ph_bookings', next);
+      const next = [...b, newBooking];
+      save(bookingKey, next);
       return next;
     });
+    if (user?.email) {
+      fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userEmail: user.email, booking: newBooking }),
+      }).catch(() => {});
+    }
   };
 
   const cancelStudentSession = (id) => {
     setBookings(b => {
       const next = b.filter(bk => bk.id !== id);
-      save('ph_bookings', next);
+      save(bookingKey, next);
       return next;
     });
     setCancelledIds(c => {
       const next = [...c, id];
-      save('ph_cancelled', next);
+      save(cancelKey, next);
       return next;
     });
+    if (user?.email) {
+      fetch(`/api/bookings?userEmail=${encodeURIComponent(user.email)}&bookingId=${id}`, {
+        method: 'DELETE',
+      }).catch(() => {});
+    }
   };
 
   const cancelTutorSession = (id) => {

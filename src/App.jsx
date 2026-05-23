@@ -16,6 +16,7 @@ import TutorDash from './pages/tutor/Dashboard.jsx';
 import TutorProfileEdit from './pages/tutor/Profile.jsx';
 import UploadContent from './pages/tutor/UploadContent.jsx';
 import Availability from './pages/tutor/Availability.jsx';
+import StudentProfile from './pages/tutor/StudentProfile.jsx';
 import ProfilePage from './pages/student/ProfilePage.jsx';
 
 // Redirects logged-in users to their home screen
@@ -71,6 +72,7 @@ export default function App() {
             <Route path="/tutor/profile" element={<TutorProfileEdit />} />
             <Route path="/tutor/availability" element={<Availability />} />
             <Route path="/tutor/upload" element={<UploadContent />} />
+            <Route path="/tutor/student/:studentId" element={<StudentProfile />} />
           </Route>
         </Route>
       </Route>

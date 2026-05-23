@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppData } from '../../store/AppDataContext.jsx';
-import { STUDENT_PAST, TUTORS } from '../../data/index.js';
+import { STUDENT_PAST, TUTORS, MOCK_USERS } from '../../data/index.js';
 import { Clock, Pin, ArrowRight } from '../../components/ui/Icons.jsx';
 
 function SessionRow({ s, past, onCancel }) {
@@ -9,6 +9,7 @@ function SessionRow({ s, past, onCancel }) {
   const [expanded, setExpanded] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const tutor = TUTORS.find(t => t.id === s.tutorId);
+  const tutorUser = MOCK_USERS.find(u => u.tutorId === s.tutorId);
 
   const handleCancel = (e) => {
     e.stopPropagation();
@@ -31,38 +32,47 @@ function SessionRow({ s, past, onCancel }) {
       onClick={() => !past && setExpanded(v => !v)}
     >
       <div className="session-row-main">
-        <div className="session-date">
-          <div className="session-dom">{s.dom}</div>
-          <div className="session-mon">{s.month}</div>
-          <div className="session-day">{s.day}</div>
-        </div>
-
-        <div className="session-body">
-          <div className="session-subject">
-            <span className={`chip ${(s.subject || '').toLowerCase()}`}>
-              <span className="chip-dot" />{s.subject}
-            </span>
+        <div className="session-left">
+          <div className="session-date">
+            <div className="session-dom">{s.dom}</div>
+            <div className="session-mon">{s.month}</div>
+            <div className="session-day">{s.day}</div>
           </div>
-          <div className="session-topic">{s.topic}</div>
-          <div className="session-meta">
-            <Clock size={12} />
-            <span>{s.time}</span>
-            <span>·</span>
-            <Pin size={12} />
-            <span>{s.location}</span>
+
+          <div className="session-body">
+            <div className="session-subject">
+              <span className={`chip ${(s.subject || '').toLowerCase()}`}>
+                <span className="chip-dot" />{s.subject}
+              </span>
+            </div>
+            <div className="session-topic">{s.topic}</div>
+            <div className="session-meta">
+              <Clock size={12} />
+              <span>{s.time}</span>
+              <span>·</span>
+              <Pin size={12} />
+              <span>{s.location}</span>
+            </div>
           </div>
         </div>
 
         {tutor && (
           <button
             className="session-tutor"
-            onClick={(e) => { e.stopPropagation(); navigate(`/tutor/${tutor.id}`); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!past && tutorUser?.email) {
+                window.location.href = `mailto:${tutorUser.email}?subject=Session%20question`;
+              } else {
+                navigate(`/tutor/${tutor.id}`);
+              }
+            }}
           >
             <div className={`avatar sm ${tutor.avatarBg}`}>{tutor.initials}</div>
             <div>
-              <div style={{ fontSize: 13, fontWeight: 500 }}>{tutor.name}</div>
-              <div style={{ fontSize: 11, color: 'var(--fg-muted)' }}>
-                {past ? 'View profile' : 'Message →'}
+              <div className="session-tutor-name">{tutor.name}</div>
+              <div className="session-tutor-sub">
+                {past ? 'View profile' : tutorUser?.email ? `Email tutor →` : 'Message →'}
               </div>
             </div>
           </button>

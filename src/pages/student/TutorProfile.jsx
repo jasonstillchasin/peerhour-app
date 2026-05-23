@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { TUTORS, SUBJECTS, SLOTS, DAYS, DAY_NUMS, HOURS } from '../../data/index.js';
+import { TUTORS, SUBJECTS, SLOTS, DAYS, DAY_NUMS, HOURS, MOCK_USERS } from '../../data/index.js';
 import { useAuth } from '../../store/AuthContext.jsx';
 import { useAppData } from '../../store/AppDataContext.jsx';
 import { Star, ArrowLeft, Calendar, Clock, Pin, Check } from '../../components/ui/Icons.jsx';
@@ -35,6 +35,7 @@ export default function TutorProfile() {
   const { user } = useAuth();
   const { addBooking } = useAppData();
   const tutor = TUTORS.find(t => t.id === id);
+  const tutorUser = MOCK_USERS.find(u => u.tutorId === id);
   const [selected, setSelected] = useState(null);
   const [subject, setSubject] = useState('');
   const [topic, setTopic] = useState('');
@@ -149,6 +150,18 @@ export default function TutorProfile() {
 
           <p className="profile-bio">{tutor.bio}</p>
           <p className="profile-bio" style={{ marginTop: 8 }}>{tutor.bio2}</p>
+
+          {tutorUser?.email && (
+            <div style={{ marginTop: 16 }}>
+              <div className="eyebrow" style={{ marginBottom: 6 }}>Contact</div>
+              <a
+                href={`mailto:${tutorUser.email}`}
+                style={{ fontSize: 13, color: 'var(--accent)', wordBreak: 'break-all' }}
+              >
+                {tutorUser.email}
+              </a>
+            </div>
+          )}
 
           {tutor.favoriteUnits && (
             <div style={{ marginTop: 16 }}>

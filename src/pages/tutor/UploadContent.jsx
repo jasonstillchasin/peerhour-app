@@ -1,18 +1,31 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { SUBJECTS, RECORDINGS } from '../../data/index.js';
 import { useAuth } from '../../store/AuthContext.jsx';
 import { useAppData } from '../../store/AppDataContext.jsx';
 import { TUTORS } from '../../data/index.js';
-import { Upload, Play, Eye, Check } from '../../components/ui/Icons.jsx';
+import { Play, Eye, Check, ExternalLink } from '../../components/ui/Icons.jsx';
 
 const LEVELS = ['Foundation', 'Intermediate', 'HSC / Advanced'];
+
+function extractYouTubeId(url) {
+  try {
+    const u = new URL(url.trim());
+    if (u.hostname === 'youtu.be') return u.pathname.slice(1).split('?')[0];
+    if (u.hostname.includes('youtube.com')) return u.searchParams.get('v') || '';
+  } catch { return ''; }
+  return '';
+}
+
+function isValidYouTubeUrl(url) {
+  return !!extractYouTubeId(url);
+}
 
 export default function UploadContent() {
   const { user } = useAuth();
   const { uploads, addUpload } = useAppData();
   const tutor = TUTORS.find(t => t.id === user?.tutorId) || TUTORS[0];
   const myRecordings = [
-    ...RECORDINGS.filter(r => r.tutorId === tutor.id),
+    ...RECORDINGS.filter(r => r.presenterId === tutor.id),
     ...uploads.filter(u => u.tutorId === tutor.id),
   ];
 
@@ -20,57 +33,55 @@ export default function UploadContent() {
   const [desc, setDesc] = useState('');
   const [subject, setSubject] = useState(tutor.subjects[0] || 'math');
   const [level, setLevel] = useState('Intermediate');
-  const [fileName, setFileName] = useState('');
-  const [fileError, setFileError] = useState('');
+  const [youtubeUrl, setYoutubeUrl] = useState('');
+  const [urlError, setUrlError] = useState('');
   const [submitted, setSubmitted] = useState(false);
-  const fileRef = useRef(null);
 
-  const MAX_SIZE = 2 * 1024 * 1024 * 1024; // 2 GB
-
-  const handleFileChange = (e) => {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    if (f.size > MAX_SIZE) {
-      setFileError('File exceeds 2 GB limit. Please compress the video first.');
-      if (fileRef.current) fileRef.current.value = '';
-      return;
+  const handleUrlChange = (e) => {
+    const val = e.target.value;
+    setYoutubeUrl(val);
+    if (val && !isValidYouTubeUrl(val)) {
+      setUrlError('Paste a YouTube link — youtube.com/watch?v=... or youtu.be/...');
+    } else {
+      setUrlError('');
     }
-    setFileError('');
-    setFileName(f.name);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!title || !desc || !fileName) return;
+    if (!title || !desc || !isValidYouTubeUrl(youtubeUrl)) return;
+    const videoId = extractYouTubeId(youtubeUrl);
     addUpload({
       tutorId: tutor.id,
       title,
       description: desc,
       subject,
       level,
-      fileName,
+      videoUrl: `https://www.youtube.com/embed/${videoId}`,
+      youtubeUrl: youtubeUrl.trim(),
       duration: '—',
     });
     setSubmitted(true);
     setTitle('');
     setDesc('');
-    setFileName('');
-    if (fileRef.current) fileRef.current.value = '';
+    setYoutubeUrl('');
     setTimeout(() => setSubmitted(false), 3000);
   };
+
+  const canSubmit = title && desc && isValidYouTubeUrl(youtubeUrl);
 
   return (
     <div>
       <div className="page-header">
         <div>
           <div className="eyebrow">For tutors</div>
-          <h1 className="page-title">Upload <em>content</em></h1>
-          <p className="page-sub">Share your knowledge — recordings count toward service hours, same as a live session.</p>
+          <h1 className="page-title">Share a <em>recording</em></h1>
+          <p className="page-sub">Upload to YouTube (unlisted or private) and paste the link here. Recordings count toward service hours.</p>
         </div>
       </div>
 
-      <div className="upload-layout" style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 32, alignItems: 'start' }}>
-        {/* Upload form */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 32, alignItems: 'start' }}>
+        {/* Form */}
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           <div>
             <label className="field-label">Video title</label>
@@ -93,6 +104,26 @@ export default function UploadContent() {
               onChange={e => setDesc(e.target.value)}
               required
             />
+          </div>
+
+          <div>
+            <label className="field-label">YouTube link</label>
+            <p style={{ fontSize: 13, color: 'var(--fg-muted)', marginBottom: 8 }}>
+              Upload to YouTube first (set visibility to Unlisted so only students with the link can view it), then paste the link below.
+            </p>
+            <input
+              className="input"
+              placeholder="https://youtu.be/... or https://www.youtube.com/watch?v=..."
+              value={youtubeUrl}
+              onChange={handleUrlChange}
+              required
+            />
+            {urlError && (
+              <p style={{ fontSize: 13, color: 'var(--danger, #c0392b)', marginTop: 6 }}>{urlError}</p>
+            )}
+            {isValidYouTubeUrl(youtubeUrl) && (
+              <p style={{ fontSize: 12, color: 'var(--success, #27ae60)', marginTop: 6 }}>✓ Valid YouTube link</p>
+            )}
           </div>
 
           <div>
@@ -127,37 +158,8 @@ export default function UploadContent() {
             </div>
           </div>
 
-          <div>
-            <label className="field-label">Video file</label>
-            <div
-              className="upload-zone"
-              style={{ cursor: 'pointer' }}
-              onClick={() => fileRef.current?.click()}
-            >
-              <Upload size={32} style={{ color: 'var(--fg-muted)', margin: '0 auto 12px' }} />
-              {fileName ? (
-                <p style={{ fontWeight: 500, marginBottom: 4, color: 'var(--accent)' }}>{fileName}</p>
-              ) : (
-                <>
-                  <p style={{ fontWeight: 500, marginBottom: 4 }}>Drop a video file here or click to browse</p>
-                  <p style={{ fontSize: 13, color: 'var(--fg-muted)' }}>MP4, MOV, or WebM · max 2 GB</p>
-                </>
-              )}
-              <input
-                ref={fileRef}
-                type="file"
-                accept="video/*"
-                style={{ display: 'none' }}
-                onChange={handleFileChange}
-              />
-            </div>
-            {fileError && (
-              <p style={{ fontSize: 13, color: 'var(--danger, #c0392b)', marginTop: 8 }}>{fileError}</p>
-            )}
-          </div>
-
-          <button type="submit" className="btn primary lg" style={{ justifyContent: 'center' }} disabled={!title || !desc || !fileName}>
-            {submitted ? <><Check size={15} /> Submitted!</> : <><Upload size={15} /> Upload video</>}
+          <button type="submit" className="btn primary lg" style={{ justifyContent: 'center' }} disabled={!canSubmit}>
+            {submitted ? <><Check size={15} /> Added!</> : 'Add recording'}
           </button>
         </form>
 
@@ -166,21 +168,31 @@ export default function UploadContent() {
           <div className="eyebrow" style={{ marginBottom: 14 }}>Your recordings ({myRecordings.length})</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {myRecordings.length === 0 ? (
-              <p style={{ color: 'var(--fg-muted)', fontSize: 14 }}>No recordings yet. Upload your first lesson!</p>
+              <p style={{ color: 'var(--fg-muted)', fontSize: 14 }}>No recordings yet. Add your first!</p>
             ) : (
               myRecordings.map(r => (
                 <div key={r.id} style={{ background: 'var(--bg-elev)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '14px 16px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
                     <span className={`chip ${r.subject}`} style={{ fontSize: 11 }}>
                       <span className="chip-dot" />{SUBJECTS.find(s => s.id === r.subject)?.name}
                     </span>
-                    <span className="pill" style={{ fontSize: 11 }}>{r.level}</span>
+                    <span className="pill" style={{ fontSize: 11 }}>{r.level || '—'}</span>
                   </div>
-                  <h4 style={{ fontSize: 14, fontWeight: 500, marginBottom: 4 }}>{r.title}</h4>
-                  <div style={{ display: 'flex', gap: 12, fontSize: 12, color: 'var(--fg-muted)' }}>
+                  <h4 style={{ fontSize: 14, fontWeight: 500, marginBottom: 6 }}>{r.title}</h4>
+                  <div style={{ display: 'flex', gap: 12, fontSize: 12, color: 'var(--fg-muted)', alignItems: 'center' }}>
                     <span><Play size={11} /> {r.duration || '—'}</span>
                     <span><Eye size={11} /> {r.views ?? 0} views</span>
-                    <span>{r.uploadedAt || 'Just now'}</span>
+                    {(r.youtubeUrl || r.videoUrl) && (
+                      <a
+                        href={r.youtubeUrl || r.videoUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ color: 'var(--accent)', display: 'flex', alignItems: 'center', gap: 4 }}
+                        onClick={e => e.stopPropagation()}
+                      >
+                        <ExternalLink size={11} /> Watch
+                      </a>
+                    )}
                   </div>
                 </div>
               ))
@@ -188,8 +200,6 @@ export default function UploadContent() {
           </div>
         </div>
       </div>
-
-      {submitted && <div className="toast">Video submitted for review ✓</div>}
     </div>
   );
 }
